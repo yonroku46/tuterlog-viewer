@@ -1,0 +1,49 @@
+.bottom-nav {
+  position: relative;
+  width: 100%;
+  height: 4.375rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 0.625rem;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 1000;
+  flex-shrink: 0;
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #8e8e93;
+    transition: all 0.2s ease;
+    flex: 1;
+    height: 100%;
+    gap: 0.25rem;
+
+    &:active {
+      opacity: 0.6;
+      transform: scale(0.95);
+    }
+
+    &.active {
+      color: #007aff;
+    }
+
+    .icon {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .label {
+      font-size: 0.625rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+  }
+}
