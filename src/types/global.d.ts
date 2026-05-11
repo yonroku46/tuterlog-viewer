@@ -79,6 +79,7 @@ declare global {
     content: string;
     images: string[];
     likes: number;
+    liked?: boolean;
     comments: CenterPostComment[];
   }
   interface CenterPostComment {
@@ -152,6 +153,27 @@ declare global {
     roleId?: number;
     lineUserId?: string;
     socialProfile?: string;
+  }
+  interface UserProfile {
+    userId: string;
+    name: string;
+    phone: string;
+    email: string;
+    profileImg?: string;
+  }
+  interface UserCenter extends Center {
+    enrolledDate: string;
+    expiredDate?: string;
+  }
+  interface UsageHistoryItem {
+    historyId: string;
+    date: string;
+    type: string;
+    detail: string;
+  }
+  interface NotificationSettings {
+    classReminder: boolean;
+    marketing: boolean;
   }
 }
 

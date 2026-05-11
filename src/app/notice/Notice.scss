@@ -96,21 +96,6 @@
       }
     }
   }
-
-  .empty-state {
-    padding: 5rem 2rem;
-    text-align: center;
-    color: #c7c7cc;
-
-    .empty-icon {
-      margin-bottom: 1rem;
-      opacity: 0.5;
-    }
-
-    p {
-      font-size: 0.9375rem;
-    }
-  }
 }
 
 .notice-detail {
@@ -174,7 +159,6 @@
         display: flex;
         align-items: center;
         gap: 0.25rem;
-
       }
     }
   }

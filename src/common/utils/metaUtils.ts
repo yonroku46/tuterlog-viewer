@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 
 type MetadataType = 'home' | 'notice' | 'reserve' | 'tickets' | 'profile' | 'lounge';
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "TuterLog";
+const APP_NAME = "TuterLog";
 const APP_DESCRIPTION = "선생님과 학생의 더 효율적인 클래스 관리를 돕는 스마트 매니저";
-const APP_URL = process.env.NEXT_PUBLIC_APP_ADDRESS || 'http://localhost:3000';
+const APP_URL = process.env.NEXT_PUBLIC_APP_ADDRESS || "http://localhost:3000";
 
 const PAGE_INFO: Record<MetadataType, { title: string; description?: string }> = {
   home: {

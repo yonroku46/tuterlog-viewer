@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Heart, MessageCircle, MoreHorizontal, User, Search, MapPin, AlertCircle, Send, Image as ImageIcon, Flag, Eye, PenSquare, ChevronDown, X } from 'lucide-react';
+import { Heart, MessageCircle, MoreHorizontal, User, Search, MapPin, AlertCircle, Send, Image as ImageIcon, Flag, Eye, PenSquare, ChevronDown, X, Loader2 } from 'lucide-react';
 import SlideDialog from '@/components/dialog/SlideDialog';
+import LoadingSpinner from '@/components/contents/LoadingSpinner';
+import EmptyState from '@/components/contents/EmptyState';
+import LoungeService from '@/api/service/LoungeService';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
@@ -12,50 +15,7 @@ import './Lounge.scss';
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
 
-const CENTERS = ['필라테스 강남점', '요가 서초점', '번지 피트니스 광교점'];
-
-const MOCK_POSTS: CenterPost[] = [
-  {
-    postId: '1',
-    centerId: 'c1',
-    author: '관리자',
-    center: '필라테스 강남점',
-    date: '2026-05-11 14:20',
-    content: '안녕하세요! 우리 센터에 새로운 필라테스 기구가 도입되었습니다. 리포머 룸에서 확인해보세요!',
-    images: ['https://images.unsplash.com/photo-1518611012118-29a81f3c9c2c?w=800&auto=format&fit=crop&q=60'],
-    likes: 12,
-    comments: [
-      { commentId: '101', postId: '1', author: '김지현', date: '2026-05-11 14:22', content: '와 리포머 룸 기대되네요!' },
-      { commentId: '102', postId: '1', author: '이성민', date: '2026-05-11 14:24', content: '내일 수업 때 가봐야겠어요.' },
-    ],
-  },
-  {
-    postId: '2',
-    centerId: 'c1',
-    author: '이유나 강사',
-    center: '요가 서초점',
-    date: '2026-05-11 12:00',
-    content: '오늘 오전 수업 다들 수고 많으셨습니다! 스트레칭 잊지 마시고 내일 또 봬요 :)',
-    images: ['https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=60'],
-    likes: 24,
-    comments: [
-      { commentId: '201', postId: '2', author: '박은지', date: '2026-05-11 13:00', content: '선생님 오늘 수업 너무 시원했어요!' },
-    ],
-  },
-  {
-    postId: '3',
-    centerId: 'c2',
-    author: '박소윤 강사',
-    center: '필라테스 강남점',
-    date: '2026-05-10 18:00',
-    content: '여름 맞이 바디 챌린지가 시작됩니다! 관심 있으신 분들은 인포데스크로 문의주세요.',
-    images: [],
-    likes: 18,
-    comments: [],
-  }
-];
-
-const SafeImage = ({ src, alt }: { src: string; alt: string; }) => {
+const SafeImage = ({ src, alt }: { src: string; alt: string }) => {
   const [error, setError] = useState(false);
 
   if (error) {
@@ -75,22 +35,24 @@ const SafeImage = ({ src, alt }: { src: string; alt: string; }) => {
         fill
         sizes="(max-width: 480px) 100vw, 480px"
         style={{ objectFit: 'cover' }}
-        onError={() => setError(true)} 
+        onError={() => setError(true)}
       />
     </div>
   );
 };
 
-const LoungePost = ({ 
-  post, 
+const LoungePost = ({
+  post,
   isReported,
   onOpenComments,
-  onReport
-}: { 
+  onReport,
+  onLike,
+}: {
   post: CenterPost;
   isReported: boolean;
   onOpenComments: (post: CenterPost) => void;
   onReport: (id: string) => void;
+  onLike: (post: CenterPost) => void;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [revealReported, setRevealReported] = useState(false);
@@ -150,7 +112,11 @@ const LoungePost = ({
           </button>
           {isMenuOpen && (
             <div className="menu-dropdown">
-              <button onClick={handleReport} disabled={isReported} style={isReported ? { opacity: 0.5, cursor: 'default', color: '#8e8e93' } : {}}>
+              <button
+                onClick={handleReport}
+                disabled={isReported}
+                style={isReported ? { opacity: 0.5, cursor: 'default', color: '#8e8e93' } : {}}
+              >
                 <Flag size={14} />
                 {isReported ? '이미 신고됨' : '게시글 신고하기'}
               </button>
@@ -171,8 +137,8 @@ const LoungePost = ({
       </div>
 
       <div className="post-actions">
-        <button className="action-btn">
-          <Heart size={20} />
+        <button className={`action-btn ${post.liked ? 'liked' : ''}`} onClick={() => onLike(post)}>
+          <Heart size={20} fill={post.liked ? 'currentColor' : 'none'} />
           <span>{post.likes}</span>
         </button>
         <button className="action-btn" onClick={() => onOpenComments(post)}>
@@ -185,106 +151,221 @@ const LoungePost = ({
 };
 
 export default function LoungePage() {
+  const [posts, setPosts] = useState<CenterPost[]>([]);
+  const [centers, setCenters] = useState<Center[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCenter, setSelectedCenter] = useState<string | null>(null);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  const [reportedIds, setReportedIds] = useState<string[]>([]);
+
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<CenterPost | null>(null);
+  const [comments, setComments] = useState<CenterPostComment[]>([]);
+  const [isCommentsLoading, setIsCommentsLoading] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [reportedIds, setReportedIds] = useState<string[]>([]);
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isSendingComment, setIsSendingComment] = useState(false);
+
   const [isWriteDialogOpen, setIsWriteDialogOpen] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
-  const [newPostCenter, setNewPostCenter] = useState(CENTERS[0]);
+  const [newPostCenterId, setNewPostCenterId] = useState('');
   const [newPostImages, setNewPostImages] = useState<{ file: File; preview: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 로컬 스토리지에서 신고된 ID 목록 불러오기
   useEffect(() => {
-    const saved = localStorage.getItem('reported_post_ids');
-    if (saved) {
+    // 신고 목록 복원
+    try {
+      const saved = localStorage.getItem('reported_post_ids');
+      if (saved) setReportedIds(JSON.parse(saved));
+    } catch {
+      /* ignore */
+    }
+
+    // 센터 목록 + 게시글 목록 병렬 로드
+    const load = async () => {
+      setIsLoading(true);
       try {
-        setReportedIds(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse reported IDs', e);
+        const [centerRes, postRes] = await Promise.all([
+          LoungeService.getCenterList(),
+          LoungeService.getPostList(),
+        ]);
+
+        if (centerRes?.list) {
+          setCenters(centerRes.list);
+          if (centerRes.list.length > 0) {
+            setNewPostCenterId(centerRes.list[0].centerId);
+          }
+        }
+        if (postRes?.list) {
+          setPosts(postRes.list);
+        }
+      } catch (err) {
+        console.error('초기 데이터 로드 실패', err);
+      } finally {
+        setIsLoading(false);
       }
+    };
+
+    load();
+  }, []);
+
+  const fetchPosts = useCallback(async (centerId?: string | null, keyword?: string) => {
+    setIsLoading(true);
+    try {
+      const res = await LoungeService.getPostList({
+        centerId: centerId ?? undefined,
+        keyword: keyword || undefined,
+      });
+      if (res?.list) setPosts(res.list);
+    } catch (err) {
+      console.error('게시글 목록 조회 실패', err);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  const filteredPosts = useMemo(() => {
-    return MOCK_POSTS.filter(post => {
-      const matchesSearch = post.content.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           post.author.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCenter = !selectedCenter || post.center === selectedCenter;
-      return matchesSearch && matchesCenter;
-    });
-  }, [searchQuery, selectedCenter]);
+  // 검색어 / 센터 필터 변경 시 서버에서 재조회
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchPosts(selectedCenter, searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [selectedCenter, searchQuery, fetchPosts]);
 
-  const handleOpenComments = (post: CenterPost) => {
+  const filteredPosts = useMemo(() => posts, [posts]);
+
+  const handleLike = async (post: CenterPost) => {
+    const prevPosts = posts;
+    setPosts(prev =>
+      prev.map(p =>
+        p.postId === post.postId
+          ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 }
+          : p
+      )
+    );
+    try {
+      await LoungeService.toggleLike(post.postId, !!post.liked);
+    } catch {
+      setPosts(prevPosts);
+    }
+  };
+
+  const handleOpenComments = async (post: CenterPost) => {
     setSelectedPost(post);
+    setComments([]);
     setCommentDialogOpen(true);
+    setIsCommentsLoading(true);
+    try {
+      const res = await LoungeService.getCommentList(post.postId);
+      if (res?.list) setComments(res.list);
+    } catch (err) {
+      console.error('댓글 조회 실패', err);
+    } finally {
+      setIsCommentsLoading(false);
+    }
   };
 
-  const handleSendComment = () => {
-    if (!newComment.trim()) return;
-    alert(`댓글이 작성되었습니다: ${newComment}`);
-    setNewComment('');
+  const handleSendComment = async () => {
+    if (!newComment.trim() || !selectedPost || isSendingComment) return;
+    setIsSendingComment(true);
+    try {
+      const res = await LoungeService.createComment({
+        postId: selectedPost.postId,
+        content: newComment.trim(),
+      });
+      if (res?.success) {
+        setNewComment('');
+        const updated = await LoungeService.getCommentList(selectedPost.postId);
+        if (updated?.list) setComments(updated.list);
+        setPosts(prev =>
+          prev.map(p =>
+            p.postId === selectedPost.postId
+              ? { ...p, comments: updated?.list ?? p.comments }
+              : p
+          )
+        );
+      }
+    } catch (err) {
+      console.error('댓글 작성 실패', err);
+      alert('댓글 작성에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSendingComment(false);
+    }
   };
 
-  const handleReportPost = (id: string) => {
-    const newReportedIds = [...reportedIds, id];
-    setReportedIds(newReportedIds);
-    localStorage.setItem('reported_post_ids', JSON.stringify(newReportedIds));
-    alert('신고가 접수되었습니다. 해당 게시글은 이제 숨겨집니다.');
-  };
-
-  const getRelativeTime = (date: string) => {
-    return dayjs(date).fromNow();
+  const handleReportPost = async (id: string) => {
+    try {
+      const res = await LoungeService.reportPost(id);
+      if (res?.success !== false) {
+        const updated = [...reportedIds, id];
+        setReportedIds(updated);
+        localStorage.setItem('reported_post_ids', JSON.stringify(updated));
+        alert('신고가 접수되었습니다. 해당 게시글은 이제 숨겨집니다.');
+      }
+    } catch (err) {
+      console.error('신고 실패', err);
+      const updated = [...reportedIds, id];
+      setReportedIds(updated);
+      localStorage.setItem('reported_post_ids', JSON.stringify(updated));
+      alert('신고가 접수되었습니다. 해당 게시글은 이제 숨겨집니다.');
+    }
   };
 
   const handleCloseWriteDialog = () => {
     if (newPostContent.trim() || newPostImages.length > 0) {
       if (confirm('작성 중인 내용이 있습니다. 정말 닫으시겠습니까?')) {
-        setIsWriteDialogOpen(false);
-        setNewPostContent('');
-        newPostImages.forEach(img => URL.revokeObjectURL(img.preview));
-        setNewPostImages([]);
+        resetWriteDialog();
       }
     } else {
-      setIsWriteDialogOpen(false);
+      resetWriteDialog();
     }
   };
 
-  const handleSubmitPost = () => {
-    if (!newPostContent.trim()) return;
-    alert('게시글이 등록되었습니다.');
+  const resetWriteDialog = () => {
     setIsWriteDialogOpen(false);
     setNewPostContent('');
     newPostImages.forEach(img => URL.revokeObjectURL(img.preview));
     setNewPostImages([]);
   };
 
+  const handleSubmitPost = async () => {
+    if (!newPostContent.trim() || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const res = await LoungeService.createPost({
+        centerId: newPostCenterId,
+        content: newPostContent.trim(),
+        imageFiles: newPostImages.map(i => i.file),
+      });
+      if (res?.success !== false) {
+        alert('게시글이 등록되었습니다.');
+        resetWriteDialog();
+        await fetchPosts(selectedCenter, searchQuery);
+      }
+    } catch (err) {
+      console.error('게시글 작성 실패', err);
+      alert('게시글 등록에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-
     const remainingSlots = 5 - newPostImages.length;
-    const selectedFiles = Array.from(files).slice(0, remainingSlots);
-
-    const newImages = selectedFiles.map(file => ({
-      file,
-      preview: URL.createObjectURL(file)
-    }));
-
-    setNewPostImages(prev => [...prev, ...newImages]);
-    
-    // Reset input value to allow selecting same file again
+    const selected = Array.from(files).slice(0, remainingSlots);
+    const newImgs = selected.map(file => ({ file, preview: URL.createObjectURL(file) }));
+    setNewPostImages(prev => [...prev, ...newImgs]);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleRemoveImage = (index: number) => {
     setNewPostImages(prev => {
-      const target = prev[index];
-      if (target) URL.revokeObjectURL(target.preview);
+      URL.revokeObjectURL(prev[index].preview);
       return prev.filter((_, i) => i !== index);
     });
   };
@@ -295,11 +376,11 @@ export default function LoungePage() {
         <div className={`search-row ${isSearchFocused || searchQuery ? 'is-searching' : ''}`}>
           <div className="search-bar">
             <Search size={18} className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="글 내용이나 작성자를 검색해보세요" 
+            <input
+              type="text"
+              placeholder="글 내용이나 작성자를 검색해보세요"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
             />
@@ -308,7 +389,7 @@ export default function LoungePage() {
             <PenSquare size={20} />
           </button>
         </div>
-        
+
         <div className="center-filter">
           <button
             className={`filter-chip ${selectedCenter === null ? 'active' : ''}`}
@@ -316,53 +397,62 @@ export default function LoungePage() {
           >
             전체
           </button>
-          {CENTERS.map((center) => (
+          {centers.map(center => (
             <button
-              key={center}
-              className={`filter-chip ${selectedCenter === center ? 'active' : ''}`}
-              onClick={() => setSelectedCenter(center)}
+              key={center.centerId}
+              className={`filter-chip ${selectedCenter === center.centerId ? 'active' : ''}`}
+              onClick={() => setSelectedCenter(center.centerId)}
             >
-              {center}
+              {center.name}
             </button>
           ))}
         </div>
       </div>
 
       <div className="posts-container">
-        {filteredPosts.length > 0 ? (
-          filteredPosts.map((post) => (
-            <LoungePost 
-              key={post.postId} 
-              post={post} 
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : filteredPosts.length > 0 ? (
+          filteredPosts.map(post => (
+            <LoungePost
+              key={post.postId}
+              post={post}
               isReported={reportedIds.includes(post.postId)}
-              onOpenComments={handleOpenComments} 
+              onOpenComments={handleOpenComments}
               onReport={handleReportPost}
+              onLike={handleLike}
             />
           ))
         ) : (
-          <div className="empty-posts">
-            <AlertCircle size={48} />
-            <p>조건에 맞는 게시글이 없습니다.</p>
-          </div>
+          <EmptyState icon={AlertCircle} message="조건에 맞는 게시글이 없습니다" />
         )}
       </div>
 
       <SlideDialog
         isOpen={commentDialogOpen}
-        onClose={() => setCommentDialogOpen(false)}
+        onClose={() => {
+          setCommentDialogOpen(false);
+          setSelectedPost(null);
+          setComments([]);
+        }}
         title={selectedPost ? `${selectedPost.author}님의 글에 댓글` : '댓글'}
         noPadding
         footer={
           <div className="comment-input-area">
-            <input 
-              type="text" 
-              placeholder="댓글을 입력하세요..." 
+            <input
+              type="text"
+              placeholder="댓글을 입력하세요..."
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
+              onChange={e => setNewComment(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && !isSendingComment && handleSendComment()}
+              disabled={isSendingComment}
             />
-            <button className={`send-btn ${newComment.trim() ? 'active' : ''}`} onClick={handleSendComment}>
-              <Send size={20} />
+            <button
+              className={`send-btn ${newComment.trim() ? 'active' : ''}`}
+              onClick={handleSendComment}
+              disabled={isSendingComment || !newComment.trim()}
+            >
+              {isSendingComment ? <Loader2 size={20} className="spin" /> : <Send size={20} />}
             </button>
           </div>
         }
@@ -375,15 +465,19 @@ export default function LoungePage() {
                   <User size={14} />
                 </div>
                 <span className="name">{selectedPost.author}</span>
-                <span className="center">{selectedPost.center.split('TuterLog ')[1] || selectedPost.center}</span>
+                <span className="center">
+                  {selectedPost.center.split('TuterLog ')[1] || selectedPost.center}
+                </span>
               </div>
               <p className="preview-content">{selectedPost.content}</p>
             </div>
           )}
 
-          {selectedPost && selectedPost.comments.length > 0 ? (
+          {isCommentsLoading ? (
+            <LoadingSpinner size={24} variant="section" />
+          ) : comments.length > 0 ? (
             <div className="comments-section">
-              {selectedPost.comments.map((comment) => (
+              {comments.map(comment => (
                 <div key={comment.commentId} className="comment-item">
                   <div className="comment-avatar">
                     <User size={16} />
@@ -391,7 +485,7 @@ export default function LoungePage() {
                   <div className="comment-content-wrap">
                     <div className="comment-meta">
                       <span className="comment-author">{comment.author}</span>
-                      <span className="comment-date">{getRelativeTime(comment.date)}</span>
+                      <span className="comment-date">{dayjs(comment.date).fromNow()}</span>
                     </div>
                     <p className="comment-text">{comment.content}</p>
                   </div>
@@ -399,10 +493,7 @@ export default function LoungePage() {
               ))}
             </div>
           ) : (
-            <div className="empty-comments">
-              <MessageCircle size={40} />
-              <p>첫 댓글을 남겨보세요!</p>
-            </div>
+            <EmptyState icon={MessageCircle} message="첫 댓글을 남겨보세요!" variant="inline" />
           )}
         </div>
       </SlideDialog>
@@ -414,12 +505,19 @@ export default function LoungePage() {
         title="새 글 작성"
         footer={
           <div className="write-dialog-footer">
-            <button 
-              className={`submit-btn ${newPostContent.trim() ? 'active' : ''}`}
+            <button
+              className={`submit-btn ${newPostContent.trim() && !isSubmitting && centers.length > 0 ? 'active' : ''}`}
               onClick={handleSubmitPost}
-              disabled={!newPostContent.trim()}
+              disabled={!newPostContent.trim() || isSubmitting || centers.length === 0}
             >
-              등록하기
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={16} className="spin" />
+                  등록 중...
+                </>
+              ) : (
+                '등록하기'
+              )}
             </button>
           </div>
         }
@@ -427,51 +525,50 @@ export default function LoungePage() {
         <div className="write-post-view">
           <div className="center-selector-wrap">
             <label>게시할 센터</label>
-            <div className="select-box-wrap">
-              <select 
-                value={newPostCenter}
-                onChange={(e) => setNewPostCenter(e.target.value)}
-              >
-                {CENTERS.map(center => (
-                  <option key={center} value={center}>
-                    {center}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={18} className="select-arrow" />
-            </div>
+            {centers.length > 0 ? (
+              <div className="select-box-wrap">
+                <select
+                  value={newPostCenterId}
+                  onChange={e => setNewPostCenterId(e.target.value)}
+                >
+                  {centers.map(center => (
+                    <option key={center.centerId} value={center.centerId}>
+                      {center.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={18} className="select-arrow" />
+              </div>
+            ) : (
+              <p className="no-center-notice">가입된 센터가 없어 글을 작성할 수 없습니다.</p>
+            )}
           </div>
 
           <div className="post-input-wrap">
-            <textarea 
+            <textarea
               placeholder="센터 회원들과 공유하고 싶은 소식을 적어보세요..."
               value={newPostContent}
-              onChange={(e) => setNewPostContent(e.target.value)}
+              onChange={e => setNewPostContent(e.target.value)}
               rows={10}
             />
           </div>
 
           <div className="image-upload-section">
-            <input 
-              type="file" 
-              accept="image/*" 
-              multiple 
-              hidden 
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
               ref={fileInputRef}
               onChange={handleImageChange}
               disabled={newPostImages.length >= 5}
             />
-            
+
             {newPostImages.length > 0 && (
               <div className="image-preview-grid">
                 {newPostImages.map((img, idx) => (
                   <div key={idx} className="preview-item">
-                    <Image 
-                      src={img.preview} 
-                      alt={`preview ${idx}`} 
-                      fill 
-                      style={{ objectFit: 'cover' }} 
-                    />
+                    <Image src={img.preview} alt={`preview ${idx}`} fill style={{ objectFit: 'cover' }} />
                     <button className="remove-btn" onClick={() => handleRemoveImage(idx)}>
                       <X size={14} />
                     </button>
