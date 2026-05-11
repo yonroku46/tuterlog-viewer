@@ -583,9 +583,77 @@
       }
     }
 
-    .image-upload-placeholder {
+    .image-upload-section {
       padding: 0 1.25rem 1.5rem;
-      
+
+      .image-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+
+        .preview-item {
+          position: relative;
+          aspect-ratio: 1;
+          border-radius: 0.75rem;
+          overflow: hidden;
+          background: #f2f2f7;
+
+          img {
+            object-fit: cover;
+          }
+
+          .remove-btn {
+            position: absolute;
+            top: 0.375rem;
+            right: 0.375rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            z-index: 2;
+
+            &:active {
+              transform: scale(0.9);
+            }
+          }
+        }
+
+        .add-more-btn {
+          aspect-ratio: 1;
+          border-radius: 0.75rem;
+          border: 2px dashed #e5e5ea;
+          background: #f8f8fa;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.25rem;
+          color: #8e8e93;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:active {
+            background: #f2f2f7;
+            border-color: #c7c7cc;
+          }
+
+          span {
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+
+    .image-upload-placeholder {
+      // Keep existing placeholder style but it's now inside section when empty
       .upload-btn {
         display: flex;
         flex-direction: column;

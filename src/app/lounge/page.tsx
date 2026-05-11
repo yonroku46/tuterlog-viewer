@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { Heart, MessageCircle, MoreHorizontal, User, Search, MapPin, AlertCircle, Send, Image as ImageIcon, Flag, Trash2, Eye, PenSquare, ChevronDown } from 'lucide-react';
+import { Heart, MessageCircle, MoreHorizontal, User, Search, MapPin, AlertCircle, Send, Image as ImageIcon, Flag, Eye, PenSquare, ChevronDown, X } from 'lucide-react';
 import SlideDialog from '@/components/dialog/SlideDialog';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -195,6 +195,8 @@ export default function LoungePage() {
   const [isWriteDialogOpen, setIsWriteDialogOpen] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostCenter, setNewPostCenter] = useState(CENTERS[0]);
+  const [newPostImages, setNewPostImages] = useState<{ file: File; preview: string }[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 로컬 스토리지에서 신고된 ID 목록 불러오기
   useEffect(() => {
@@ -240,10 +242,12 @@ export default function LoungePage() {
   };
 
   const handleCloseWriteDialog = () => {
-    if (newPostContent.trim()) {
+    if (newPostContent.trim() || newPostImages.length > 0) {
       if (confirm('작성 중인 내용이 있습니다. 정말 닫으시겠습니까?')) {
         setIsWriteDialogOpen(false);
         setNewPostContent('');
+        newPostImages.forEach(img => URL.revokeObjectURL(img.preview));
+        setNewPostImages([]);
       }
     } else {
       setIsWriteDialogOpen(false);
@@ -255,6 +259,34 @@ export default function LoungePage() {
     alert('게시글이 등록되었습니다.');
     setIsWriteDialogOpen(false);
     setNewPostContent('');
+    newPostImages.forEach(img => URL.revokeObjectURL(img.preview));
+    setNewPostImages([]);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const remainingSlots = 5 - newPostImages.length;
+    const selectedFiles = Array.from(files).slice(0, remainingSlots);
+
+    const newImages = selectedFiles.map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+
+    setNewPostImages(prev => [...prev, ...newImages]);
+    
+    // Reset input value to allow selecting same file again
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setNewPostImages(prev => {
+      const target = prev[index];
+      if (target) URL.revokeObjectURL(target.preview);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   return (
@@ -419,11 +451,49 @@ export default function LoungePage() {
             />
           </div>
 
-          <div className="image-upload-placeholder">
-            <div className="upload-btn">
-              <ImageIcon size={24} />
-              <span>사진 추가 (최대 5장)</span>
-            </div>
+          <div className="image-upload-section">
+            <input 
+              type="file" 
+              accept="image/*" 
+              multiple 
+              hidden 
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              disabled={newPostImages.length >= 5}
+            />
+            
+            {newPostImages.length > 0 && (
+              <div className="image-preview-grid">
+                {newPostImages.map((img, idx) => (
+                  <div key={idx} className="preview-item">
+                    <Image 
+                      src={img.preview} 
+                      alt={`preview ${idx}`} 
+                      fill 
+                      style={{ objectFit: 'cover' }} 
+                    />
+                    <button className="remove-btn" onClick={() => handleRemoveImage(idx)}>
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+                {newPostImages.length < 5 && (
+                  <button className="add-more-btn" onClick={() => fileInputRef.current?.click()}>
+                    <ImageIcon size={20} />
+                    <span>{newPostImages.length}/5</span>
+                  </button>
+                )}
+              </div>
+            )}
+
+            {newPostImages.length === 0 && (
+              <div className="image-upload-placeholder" onClick={() => fileInputRef.current?.click()}>
+                <div className="upload-btn">
+                  <ImageIcon size={24} />
+                  <span>사진 추가 (최대 5장)</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </SlideDialog>
