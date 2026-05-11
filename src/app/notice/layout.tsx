@@ -1,9 +1,6 @@
-import type { Metadata } from "next";
+import { generatePageMetadata } from "@/common/utils/metaUtils";
 
-export const metadata: Metadata = {
-  title: "공지사항",
-  description: "센터와 서비스 공지사항을 확인하세요.",
-};
+export const metadata = generatePageMetadata('notice');
 
 export default function NoticeLayout({
   children,

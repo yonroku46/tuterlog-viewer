@@ -175,7 +175,7 @@ export default function ProfilePage() {
           <h2 className="name">홍길동 님</h2>
           <p className="details">
             010-0000-0000<br />
-            hong@tutorlog.com
+            hong@tuterlog.com
           </p>
         </div>
         <button className="edit-btn">

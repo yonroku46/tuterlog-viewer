@@ -1,9 +1,6 @@
-import type { Metadata } from "next";
+import { generatePageMetadata } from "@/common/utils/metaUtils";
 
-export const metadata: Metadata = {
-  title: "수강권",
-  description: "보유하신 수강권 현황을 확인하세요.",
-};
+export const metadata = generatePageMetadata('tickets');
 
 export default function TicketsLayout({
   children,

@@ -1,8 +1,9 @@
-# MK-LP
+# TUTERLOG-VIEWER
 
-Next.js (App Router) based Landing Page project.
+Next.js (App Router) based Viewer project.
 
 ## Tech Stack
+
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: Sass (SCSS)
@@ -10,12 +11,14 @@ Next.js (App Router) based Landing Page project.
 - **Package Manager**: Yarn
 
 ## Getting Started
+
 ```bash
 yarn install
 yarn dev
 ```
 
 ## Folder Structure
+
 - `src/app`: Page routes and layouts
 - `src/components`: Reusable UI components
 - `src/styles`: Global styles and SCSS variables/mixins

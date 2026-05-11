@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
+import { generatePageMetadata } from "@/common/utils/metaUtils";
 
-export const metadata: Metadata = {
-  title: "마이페이지",
-  description: "회원 정보 및 서비스 설정을 관리하세요.",
-};
+export const metadata: Metadata = generatePageMetadata('profile');
 
 export default function ProfileLayout({
   children,

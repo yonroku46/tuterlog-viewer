@@ -1,9 +1,6 @@
-import type { Metadata } from "next";
+import { generatePageMetadata } from "@/common/utils/metaUtils";
 
-export const metadata: Metadata = {
-  title: "라운지",
-  description: "라운지에서 다른 센터멤버와 소통하세요.",
-};
+export const metadata = generatePageMetadata('lounge');
 
 export default function LoungeLayout({
   children,

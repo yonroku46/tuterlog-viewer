@@ -9,7 +9,7 @@ import './Home.scss';
 
 dayjs.locale('ko');
 
-const CENTERS = ['TutorLog 필라테스 강남점', 'TutorLog 요가 서초점', 'TutorLog 번지 피트니스 광교점'];
+const CENTERS = ['필라테스 강남점', '요가 서초점', '피트니스 광교점'];
 
 const TICKETS = [
   {

@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
+import { generatePageMetadata } from "@/common/utils/metaUtils";
 
-export const metadata: Metadata = {
-  title: "수업예약",
-  description: "수업 예약 및 스케줄 관리를 진행하세요.",
-};
+export const metadata: Metadata = generatePageMetadata('reserve');
 
 export default function ReserveLayout({
   children,

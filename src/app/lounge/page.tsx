@@ -12,14 +12,14 @@ import './Lounge.scss';
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
 
-const CENTERS = ['TutorLog 필라테스 강남점', 'TutorLog 요가 서초점', 'TutorLog 번지 피트니스 광교점'];
+const CENTERS = ['필라테스 강남점', '요가 서초점', '번지 피트니스 광교점'];
 
 const MOCK_POSTS: CenterPost[] = [
   {
     postId: '1',
     centerId: 'c1',
     author: '관리자',
-    center: 'TutorLog 필라테스 강남점',
+    center: '필라테스 강남점',
     date: '2026-05-11 14:20',
     content: '안녕하세요! 우리 센터에 새로운 필라테스 기구가 도입되었습니다. 리포머 룸에서 확인해보세요!',
     images: ['https://images.unsplash.com/photo-1518611012118-29a81f3c9c2c?w=800&auto=format&fit=crop&q=60'],
@@ -33,7 +33,7 @@ const MOCK_POSTS: CenterPost[] = [
     postId: '2',
     centerId: 'c1',
     author: '이유나 강사',
-    center: 'TutorLog 요가 서초점',
+    center: '요가 서초점',
     date: '2026-05-11 12:00',
     content: '오늘 오전 수업 다들 수고 많으셨습니다! 스트레칭 잊지 마시고 내일 또 봬요 :)',
     images: ['https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=60'],
@@ -46,7 +46,7 @@ const MOCK_POSTS: CenterPost[] = [
     postId: '3',
     centerId: 'c2',
     author: '박소윤 강사',
-    center: 'TutorLog 필라테스 강남점',
+    center: '필라테스 강남점',
     date: '2026-05-10 18:00',
     content: '여름 맞이 바디 챌린지가 시작됩니다! 관심 있으신 분들은 인포데스크로 문의주세요.',
     images: [],
@@ -138,7 +138,7 @@ const LoungePost = ({
               <span className="author-name">{post.author}</span>
               <span className="center-tag">
                 <MapPin size={10} />
-                {post.center.split('TutorLog ')[1] || post.center}
+                {post.center}
               </span>
             </div>
             <span className="post-date">{dayjs(post.date).fromNow()}</span>
@@ -290,7 +290,7 @@ export default function LoungePage() {
               className={`filter-chip ${selectedCenter === center ? 'active' : ''}`}
               onClick={() => setSelectedCenter(center)}
             >
-              {center.split('TutorLog ')[1] || center}
+              {center}
             </button>
           ))}
         </div>
@@ -343,7 +343,7 @@ export default function LoungePage() {
                   <User size={14} />
                 </div>
                 <span className="name">{selectedPost.author}</span>
-                <span className="center">{selectedPost.center.split('TutorLog ')[1] || selectedPost.center}</span>
+                <span className="center">{selectedPost.center.split('TuterLog ')[1] || selectedPost.center}</span>
               </div>
               <p className="preview-content">{selectedPost.content}</p>
             </div>
