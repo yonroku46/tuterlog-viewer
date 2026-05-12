@@ -27,74 +27,92 @@ declare global {
   // Business
   type TicketType = 'GROUP' | 'PT';
   type NotificationIconType = 'LOGO' | 'AVATAR';
-  type ReservationStatus = 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NOSHOW';
-  type ProfileMenuType = 'CENTER' | 'TICKET' | 'PRODUCT' | 'HISTORY' | 'NOTICE_SETTING' | 'SYSTEM_SETTING' | null;
+  type ReservationStatus = 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NOSHOW' | 'WAITING';
+  type ProfileMenuType = 'CENTER' | 'EDIT_PROFILE' | 'TICKET' | 'PRODUCT' | 'HISTORY' | 'NOTICE_SETTING' | 'SYSTEM_SETTING' | null;
   interface Ticket {
     ticketId: string;
-    type: TicketType;
-    name: string;
+    userId?: string;
+    centerId?: string;
+    ticketType: TicketType;
+    title: string;
+    subTitle: string;
     centerName: string;
     stats: {
       available: number;
       cancelable: number;
       remaining: number | string;
     };
-    dateRange: string;
-    expiryDate?: string;
+    startDate: string;
+    endDate: string;
     remainingDays?: number;
     totalSessions?: number;
     usedSessions?: number;
     isPT?: boolean;
+    createTime: string;
   }
   interface Instructor {
     instructorId: string;
+    centerId: string;
     name: string;
     profileImg?: string;
     role?: string;
+    createTime: string;
   }
   interface Reservation {
     reservationId: string;
-    centerId: number;
-    date: string;
-    time: string;
+    userId?: string;
+    classId: string;
+    centerId: string;
+    reservationDate: string;
+    startTime: string;
+    endTime: string;
     className: string;
-    instructor: string;
+    instructor: Instructor;
     room: string;
     status: ReservationStatus;
     reservedCount: number;
     capacity: number;
+    createTime: string;
   }
   interface Center {
     centerId: string;
     name: string;
     address: string;
     phone?: string;
+    createTime: string;
   }
   interface CenterPost {
     postId: string;
     centerId: string;
-    author: string;
+    authorId?: string;
     center: string;
-    date: string;
     content: string;
     images: string[];
     likes: number;
     liked?: boolean;
     comments: CenterPostComment[];
+    createTime: string;
+  }
+  interface CenterPostRes extends CenterPost{
+    author: UserProfile;
   }
   interface CenterPostComment {
     commentId: string;
     postId: string;
-    author: string;
-    date: string;
+    authorId?: string;
     content: string;
+    createTime: string;
+  }
+  interface CenterPostCommentRes extends CenterPostComment {
+    author: UserProfile;
   }
   interface ClassInfo {
     classId: string;
+    centerId?: string;
     startTime: string;
     endTime: string;
     name: string;
-    instructor: string;
+    instructor: Instructor;
     room: string;
     reserved: number;
     capacity: number;
@@ -107,23 +125,28 @@ declare global {
   }
   interface Notice {
     noticeId: string;
+    centerId?: string;
     tag: string;
     title: string;
-    date: string;
-    author: string;
+    authorId?: string;
     content: string;
     important?: boolean;
     facility?: boolean;
+    createTime: string;
+  }
+  interface NoticeRes extends Notice {
+    author: UserProfile;
   }
   interface AppNotification {
     appNotificationId: string;
+    userId: string;
+    centerId?: string;
     title: string;
     message: string;
-    time: string;
-    fullDate: string;
     centerName?: string;
     isRead: boolean;
     iconType: NotificationIconType;
+    createTime: string;
   }
   // UI Components
   interface TimeFilterOption {
@@ -138,28 +161,17 @@ declare global {
     redirectUri?: string;
   }
   // DB
-  interface User {
-    userId: string;
-    userName: string;
-    profileImg: string;
-    mail: string;
-    userIntro?: string;
-    phoneNum?: string;
-    birthday?: string;
-    gender?: string;
-    postalCode?: string;
-    detailAddress?: string;
-    profileImgFile?: File;
-    roleId?: number;
-    lineUserId?: string;
-    socialProfile?: string;
-  }
   interface UserProfile {
     userId: string;
     name: string;
     phone: string;
     email: string;
+    gender?: string;
     profileImg?: string;
+    classReminder: boolean;
+    marketing: boolean;
+    lastUpdated: string;
+    createTime: string;
   }
   interface UserCenter extends Center {
     enrolledDate: string;
@@ -167,13 +179,9 @@ declare global {
   }
   interface UsageHistoryItem {
     historyId: string;
-    date: string;
-    type: string;
-    detail: string;
-  }
-  interface NotificationSettings {
-    classReminder: boolean;
-    marketing: boolean;
+    contentType: string;
+    contentDetail: string;
+    createTime: string;
   }
 }
 

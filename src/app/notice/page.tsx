@@ -10,8 +10,8 @@ import './Notice.scss';
 
 export default function NoticePage() {
   const [activeTab, setActiveTab] = useState<NoticeType>('center');
-  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
-  const [notices, setNotices] = useState<Notice[]>([]);
+  const [selectedNotice, setSelectedNotice] = useState<NoticeRes | null>(null);
+  const [notices, setNotices] = useState<NoticeRes[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function NoticePage() {
                 <span className={`tag ${notice.important ? 'important' : ''} ${notice.facility ? 'facility' : ''}`}>
                   {notice.tag}
                 </span>
-                <span className="date">{notice.date}</span>
+                <span className="date">{notice.createTime}</span>
               </div>
               <h2 className="notice-title">{notice.title}</h2>
             </button>
@@ -85,13 +85,13 @@ export default function NoticePage() {
                 <span className={`tag ${selectedNotice.important ? 'important' : ''} ${selectedNotice.facility ? 'facility' : ''}`}>
                   {selectedNotice.tag}
                 </span>
-                <span className="date">{selectedNotice.date}</span>
+                <span className="date">{selectedNotice.createTime}</span>
               </div>
               <h1 className="title">{selectedNotice.title}</h1>
               <div className="meta">
                 <div className="info-item">
                   <User size={14} />
-                  <span>{selectedNotice.author}</span>
+                  <span>{selectedNotice.author.name}</span>
                 </div>
               </div>
             </div>

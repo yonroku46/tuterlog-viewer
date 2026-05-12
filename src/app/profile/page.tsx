@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Bell, Pencil, Smile, Building2, CreditCard, Package, Search, ChevronRight, Settings, ShieldCheck, HelpCircle, LogOut, Globe, Check, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import SlideDialog from '@/components/dialog/SlideDialog';
@@ -9,9 +9,6 @@ import EmptyState from '@/components/contents/EmptyState';
 import Skeleton from '@/components/contents/Skeleton';
 import ProfileService from '@/api/service/ProfileService';
 import './Profile.scss';
-import { useRef } from 'react';
-
-type ProfileMenuType = 'CENTER' | 'TICKET' | 'PRODUCT' | 'HISTORY' | 'NOTICE_SETTING' | 'SYSTEM_SETTING' | 'EDIT_PROFILE' | null;
 
 export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,10 +24,6 @@ export default function ProfilePage() {
   const [tickets, setTickets] = useState<UsageHistoryItem[]>([]);
   const [products, setProducts] = useState<UsageHistoryItem[]>([]);
   const [history, setHistory] = useState<UsageHistoryItem[]>([]);
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
-    classReminder: false,
-    marketing: false,
-  });
   const [isDialogLoading, setIsDialogLoading] = useState(false);
 
   // 페이지 마운트 시 프로필 로드
@@ -78,8 +71,7 @@ export default function ProfilePage() {
             break;
           }
           case 'NOTICE_SETTING': {
-            const res = await ProfileService.getNotificationSettings();
-            if (res) setNotificationSettings(res);
+            // 알림 설정은 이미 profile 객체에 포함되어 있으므로 추가 조회 생략
             break;
           }
         }
@@ -95,14 +87,15 @@ export default function ProfilePage() {
 
   const closeDialog = () => setActiveMenu(null);
 
-  const handleToggleNotification = async (key: keyof NotificationSettings) => {
-    const updated = { ...notificationSettings, [key]: !notificationSettings[key] };
-    setNotificationSettings(updated);
+  const handleToggleNotification = async (key: 'classReminder' | 'marketing') => {
+    if (!profile) return;
+    const updatedValue = !profile[key];
+    setProfile({ ...profile, [key]: updatedValue });
     try {
-      await ProfileService.updateNotificationSettings({ [key]: updated[key] });
+      await ProfileService.updateProfile({ [key]: updatedValue });
     } catch {
-      // 실패 시 롤백
-      setNotificationSettings(notificationSettings);
+      // 실패 시 롤백 (profile 복구)
+      setProfile({ ...profile });
     }
   };
 
@@ -134,14 +127,14 @@ export default function ProfilePage() {
 
   const getMenuTitle = () => {
     switch (activeMenu) {
-      case 'EDIT_PROFILE':    return '프로필 수정';
-      case 'CENTER':          return '센터 조회';
-      case 'TICKET':          return '수강권 조회';
-      case 'PRODUCT':         return '상품 조회';
-      case 'HISTORY':         return '전체 이용 내역';
-      case 'NOTICE_SETTING':  return '알림 설정';
-      case 'SYSTEM_SETTING':  return '환경 설정';
-      default:                return '';
+      case 'EDIT_PROFILE': return '프로필 수정';
+      case 'CENTER': return '센터 조회';
+      case 'TICKET': return '수강권 조회';
+      case 'PRODUCT': return '상품 조회';
+      case 'HISTORY': return '전체 이용 내역';
+      case 'NOTICE_SETTING': return '알림 설정';
+      case 'SYSTEM_SETTING': return '환경 설정';
+      default: return '';
     }
   };
 
@@ -179,10 +172,10 @@ export default function ProfilePage() {
           <div className="history-list">
             {tickets.length > 0 ? tickets.map(item => (
               <div key={item.historyId} className="history-item">
-                <div className="date">{item.date}</div>
+                <div className="date">{item.createTime}</div>
                 <div className="content">
-                  <div className="type">{item.type}</div>
-                  <div className="detail">{item.detail}</div>
+                  <div className="type">{item.contentType}</div>
+                  <div className="detail">{item.contentDetail}</div>
                 </div>
               </div>
             )) : <EmptyState message="수강권 내역이 없습니다" variant="dialog" />}
@@ -194,10 +187,10 @@ export default function ProfilePage() {
           <div className="history-list">
             {products.length > 0 ? products.map(item => (
               <div key={item.historyId} className="history-item">
-                <div className="date">{item.date}</div>
+                <div className="date">{item.createTime}</div>
                 <div className="content">
-                  <div className="type">{item.type}</div>
-                  <div className="detail">{item.detail}</div>
+                  <div className="type">{item.contentType}</div>
+                  <div className="detail">{item.contentDetail}</div>
                 </div>
               </div>
             )) : <EmptyState message="상품 내역이 없습니다" variant="dialog" />}
@@ -209,10 +202,10 @@ export default function ProfilePage() {
           <div className="history-list">
             {history.length > 0 ? history.map(item => (
               <div key={item.historyId} className="history-item">
-                <div className="date">{item.date}</div>
+                <div className="date">{item.createTime}</div>
                 <div className="content">
-                  <div className="type">{item.type}</div>
-                  <div className="detail">{item.detail}</div>
+                  <div className="type">{item.contentType}</div>
+                  <div className="detail">{item.contentDetail}</div>
                 </div>
               </div>
             )) : <EmptyState message="이용 내역이 없습니다" variant="dialog" />}
@@ -226,14 +219,14 @@ export default function ProfilePage() {
               <div className="setting-item">
                 <span>수업 시작 알림</span>
                 <div
-                  className={`toggle ${notificationSettings.classReminder ? 'active' : ''}`}
+                  className={`toggle ${profile?.classReminder ? 'active' : ''}`}
                   onClick={() => handleToggleNotification('classReminder')}
                 />
               </div>
               <div className="setting-item">
                 <span>마케팅 정보 수신 동의</span>
                 <div
-                  className={`toggle ${notificationSettings.marketing ? 'active' : ''}`}
+                  className={`toggle ${profile?.marketing ? 'active' : ''}`}
                   onClick={() => handleToggleNotification('marketing')}
                 />
               </div>

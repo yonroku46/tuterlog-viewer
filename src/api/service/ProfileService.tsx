@@ -108,38 +108,6 @@ class ProfileService {
       throw error;
     }
   }
-
-  /**
-   * 알림 설정 조회
-   * GET /user/notification-settings
-   */
-  async getNotificationSettings(): Promise<NotificationSettings | undefined> {
-    try {
-      const response: ApiResponse = await ApiInstance.get(ApiRoutes.PROFILE_NOTIFICATION);
-      if (response && !response.hasErrors) {
-        return response.responseData as NotificationSettings;
-      }
-    } catch (error) {
-      console.error('[ProfileService] getNotificationSettings', error);
-      throw error;
-    }
-  }
-
-  /**
-   * 알림 설정 수정
-   * PATCH /user/notification-settings
-   */
-  async updateNotificationSettings(data: Partial<NotificationSettings>): Promise<ActionRes | undefined> {
-    try {
-      const response: ApiResponse = await ApiInstance.patch(ApiRoutes.PROFILE_NOTIFICATION, data);
-      if (response && !response.hasErrors) {
-        return response.responseData as ActionRes;
-      }
-    } catch (error) {
-      console.error('[ProfileService] updateNotificationSettings', error);
-      throw error;
-    }
-  }
 }
 
 export default ProfileService.getInstance();

@@ -5,36 +5,35 @@ import { Bell, User } from 'lucide-react';
 import dayjs from 'dayjs';
 import './NotificationList.scss';
 
+dayjs.locale('ko');
+
 const NotificationList = () => {
   const [notifications, setNotifications] = useState<AppNotification[]>([
     {
       appNotificationId: '3',
       title: '수업 미리 알림',
       message: '[2026.04.03 (금) 09:00] [체어 | 리포머] 수업이 예정되어 있습니다.',
-      time: '오전 09:12',
-      fullDate: '2026년 04월 03일',
       isRead: false,
-      iconType: 'AVATAR'
+      iconType: 'AVATAR',
+      createTime: '2026-04-03 09:12',
     },
     {
       appNotificationId: '1',
       title: '잔여횟수 미리 알림',
       message: '[마토바 미쿠]님! [그룹 레슨/50회]의 잔여횟수가 3 회 남았습니다.',
-      time: '오후 02:30',
-      fullDate: '2026년 05월 11일',
       centerName: '엠씨기구필라테스 김해점',
       isRead: true,
-      iconType: 'LOGO'
+      iconType: 'LOGO',
+      createTime: '2026-05-11 14:30',
     },
     {
       appNotificationId: '2',
       title: '잔여일 미리 알림',
       message: '[마토바 미쿠]님! [그룹 레슨/50회]의 잔여일이 3 일 남았습니다.',
-      time: '오전 11:05',
-      fullDate: '2026년 04월 04일',
       centerName: '엠씨기구필라테스 김해점',
       isRead: true,
-      iconType: 'LOGO'
+      iconType: 'LOGO',
+      createTime: '2026-04-04 11:05',
     }
   ]);
 
@@ -59,12 +58,13 @@ const NotificationList = () => {
     };
 
     const sorted = [...notifications].sort((a, b) => 
-      dayjs(parseDate(b.fullDate)).unix() - dayjs(parseDate(a.fullDate)).unix()
+      dayjs(b.createTime).unix() - dayjs(a.createTime).unix()
     );
 
     const groups = sorted.reduce((acc, n) => {
-      if (!acc[n.fullDate]) acc[n.fullDate] = [];
-      acc[n.fullDate].push(n);
+      const date = dayjs(n.createTime).format('YYYY년 MM월 DD일');
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(n);
       return acc;
     }, {} as Record<string, AppNotification[]>);
 
@@ -117,7 +117,7 @@ const NotificationList = () => {
                   <div className="header-row">
                     <div className="title-group">
                       <span className="item-title">{item.title}</span>
-                      <span className="item-time">{item.time}</span>
+                      <span className="item-time">{dayjs(item.createTime).format('a h:mm')}</span>
                     </div>
                   </div>
                   <p className="item-message">{item.message}</p>

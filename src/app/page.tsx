@@ -11,30 +11,36 @@ dayjs.locale('ko');
 
 const CENTERS = ['필라테스 강남점', '요가 서초점', '피트니스 광교점'];
 
-const TICKETS = [
+const TICKETS: Ticket[] = [
   {
-    id: 1,
-    type: 'GROUP',
+    ticketId: '1',
+    ticketType: 'GROUP',
+    title: '6:1 그룹 회원권',
     subTitle: '6:1 · 횟수제 · 주3회 · 당일변경 1회',
-    name: '6:1 그룹 회원권',
-    dateRange: '2024. 3. 14. ~ 2024. 12. 31. (93일 남음)',
-    stats: { available: 29, cancelable: 30, remaining: '30 / 30' }
+    centerName: '필라테스 강남점',
+    startDate: '2026-05-20',
+    endDate: '2027-07-01',
+    stats: { available: 29, cancelable: 30, remaining: '30 / 30' },
+    createTime: '2024-03-14'
   },
   {
-    id: 2,
-    type: 'PT',
+    ticketId: '2',
+    ticketType: 'PT',
+    title: '1:1 개인 PT 10회권',
     subTitle: '1:1 · 개인레슨 · 상시가능',
-    name: '1:1 개인 PT 10회권',
-    dateRange: '2024. 04. 01. ~ 2024. 07. 01. (52일 남음)',
-    stats: { available: 8, cancelable: 10, remaining: '8 / 10' }
+    centerName: '필라테스 강남점',
+    startDate: '2026-05-20',
+    endDate: '2026-07-21',
+    stats: { available: 8, cancelable: 10, remaining: '8 / 10' },
+    createTime: '2024-04-01'
   }
 ];
 
 const USER_RESERVATIONS: Reservation[] = [
-  { reservationId: '1', centerId: 0, date: '2026-05-11', time: '09:00 - 09:50', className: '6:1 리포머&캐딜락', instructor: '이유나 강사', room: '리포머 룸', status: 'CONFIRMED', reservedCount: 5, capacity: 6 },
-  { reservationId: '2', centerId: 0, date: '2026-05-16', time: '14:00 - 14:50', className: '6:1 체어 & 바렐', instructor: '박소윤 강사', room: '체어 룸', status: 'CONFIRMED', reservedCount: 6, capacity: 6 },
-  { reservationId: '3', centerId: 1, date: '2026-05-15', time: '19:00 - 19:50', className: '빈야사 요가 A', instructor: '김하늘 강사', room: 'Studio 2', status: 'CANCELLED', reservedCount: 15, capacity: 15 },
-  { reservationId: '4', centerId: 0, date: '2026-05-20', time: '11:00 - 11:50', className: '6:1 스프링보드', instructor: '이유나 강사', room: 'Reformer 2', status: 'CONFIRMED', reservedCount: 4, capacity: 6 },
+  { reservationId: '1', centerId: '0', userId: '0', classId: '1', reservationDate: '2026-05-11', startTime: '09:00', endTime: '09:50', className: '6:1 리포머&캐딜락', instructor: { instructorId: '1', name: '이유나 강사', centerId: '0', profileImg: '', role: '', createTime: '' }, room: '리포머 룸', status: 'CONFIRMED', reservedCount: 5, capacity: 6, createTime: '2026-05-11 12:00' },
+  { reservationId: '2', centerId: '0', userId: '0', classId: '2', reservationDate: '2026-05-16', startTime: '14:00', endTime: '14:50', className: '6:1 체어 & 바렐', instructor: { instructorId: '2', name: '박소윤 강사', centerId: '0', profileImg: '', role: '', createTime: '' }, room: '체어 룸', status: 'CONFIRMED', reservedCount: 6, capacity: 6, createTime: '2026-05-16 12:00' },
+  { reservationId: '3', centerId: '1', userId: '0', classId: '3', reservationDate: '2026-05-15', startTime: '19:00', endTime: '19:50', className: '빈야사 요가 A', instructor: { instructorId: '3', name: '김하늘 강사', centerId: '1', profileImg: '', role: '', createTime: '' }, room: 'Studio 2', status: 'CANCELLED', reservedCount: 15, capacity: 15, createTime: '2026-05-15 12:00' },
+  { reservationId: '4', centerId: '0', userId: '0', classId: '4', reservationDate: '2026-05-20', startTime: '11:00', endTime: '11:50', className: '6:1 스프링보드', instructor: { instructorId: '1', name: '이유나 강사', centerId: '0', profileImg: '', role: '', createTime: '' }, room: 'Reformer 2', status: 'CONFIRMED', reservedCount: 4, capacity: 6, createTime: '2026-05-20 12:00' },
 ];
 
 const ReservedCard = ({ 
@@ -70,7 +76,7 @@ const ReservedCard = ({
       <div className="class-date">
         <div className="date-left">
           <span className="date-text">
-            {dayjs(reservation.date).format('YYYY. M. D (ddd)')} {reservation.time}
+            {dayjs(reservation.reservationDate).format('YYYY. M. D (ddd)')} {reservation.startTime} - {reservation.endTime}
           </span>
           <span className={`status-badge ${reservation.status.toLocaleLowerCase()}`}>
             {reservation.status === 'CONFIRMED' ? '예약확정' : reservation.status === 'CANCELLED' ? '취소' : '대기중'}
@@ -85,7 +91,7 @@ const ReservedCard = ({
             {isMenuOpen && (
               <div className="menu-dropdown">
                 <button onClick={() => {
-                  const isToday = dayjs(reservation.date).isSame(dayjs(), 'day');
+                  const isToday = dayjs(reservation.reservationDate).isSame(dayjs(), 'day');
                   if (isToday) {
                     alert('당일 수업은 취소가 불가능합니다.');
                     setIsMenuOpen(false);
@@ -112,7 +118,7 @@ const ReservedCard = ({
         </div>
         <div className="details">
           <p className="title">{reservation.className}</p>
-          <p className="desc">{reservation.instructor} | {reservation.room}</p>
+          <p className="desc">{reservation.instructor.name} | {reservation.room}</p>
           <div className="attendance-info">
             <span className="capacity-label">{reservation.capacity}명 정원</span>
             <span className="divider">·</span>
@@ -153,13 +159,13 @@ export default function HomePage() {
 
   // 현재 센터의 예약 내역
   const myReservations = useMemo(() => {
-    return USER_RESERVATIONS.filter(res => res.centerId === centerIndex)
-      .sort((a, b) => dayjs(a.date).unix() - dayjs(b.date).unix());
+    return USER_RESERVATIONS.filter(res => res.centerId === centerIndex.toString())
+      .sort((a, b) => dayjs(a.reservationDate).unix() - dayjs(b.reservationDate).unix());
   }, [centerIndex]);
 
   // 선택된 날짜의 예약 내역 (홈 화면용)
   const reservationsForDate = useMemo(() => {
-    return myReservations.filter(res => dayjs(res.date).isSame(selectedDate, 'day'));
+    return myReservations.filter(res => dayjs(res.reservationDate).isSame(selectedDate, 'day'));
   }, [myReservations, selectedDate]);
 
   const dateRange = useMemo(() => {
@@ -278,31 +284,41 @@ export default function HomePage() {
           onMouseUp={onMouseUp}
           onMouseLeave={onMouseUp}
         >
-          {TICKETS.map((ticket, i) => (
-            <div 
-              key={ticket.id} 
-              className={`premium-ticket ${ticket.type === 'PT' ? 'pt-ticket' : ''} ${activeTicketIndex === i ? 'active' : ''}`}
-            >
-              <div className="ticket-header">
-                <span className="center-name">{selectedCenter}</span>
-                <span className="status-badge">사용 중</span>
-              </div>
-              <h2 className="ticket-name">{ticket.name}</h2>
-              <div className="usage-progress">
-                <div className="label-row">
-                  <span>수강 현황</span>
-                  <span className="remaining">{ticket.stats.available} / {ticket.stats.cancelable}회</span>
+          {TICKETS.map((ticket, i) => {
+            const today = dayjs().startOf('day');
+            const endDate = dayjs(ticket.endDate).startOf('day');
+            const diffDays = endDate.diff(today, 'day');
+            const isExpired = diffDays < 0;
+
+            return (
+              <div 
+                key={ticket.ticketId} 
+                className={`premium-ticket ${ticket.ticketType === 'PT' ? 'pt-ticket' : ''} ${activeTicketIndex === i ? 'active' : ''} ${isExpired ? 'expired' : ''}`}
+              >
+                <div className="ticket-header">
+                  <span className="center-name">{ticket.centerName}</span>
+                  <span className={`status-badge ${isExpired ? 'expired' : ''}`}>{isExpired ? '기간만료' : '사용중'}</span>
                 </div>
-                <div className="progress-bar-bg">
-                  <div className="progress-bar-fill" style={{ width: `${(ticket.stats.available / ticket.stats.cancelable) * 100}%` }}></div>
+                <h2 className="ticket-name">{ticket.title}</h2>
+                <div className="usage-progress">
+                  <div className="label-row">
+                    <span>수강 현황</span>
+                    <span className="remaining">{ticket.stats.available} / {ticket.stats.cancelable}회</span>
+                  </div>
+                  <div className="progress-bar-bg">
+                    <div className="progress-bar-fill" style={{ width: `${(ticket.stats.available / ticket.stats.cancelable) * 100}%` }}></div>
+                  </div>
+                </div>
+                <div className="expiry-info">
+                  <CalendarDays size={14} />
+                  <span>
+                    {dayjs(ticket.startDate).format('YYYY. M. D')} ~ {dayjs(ticket.endDate).format('YYYY. M. D')}
+                    {!isExpired && (diffDays === 0 ? ' (오늘 만료)' : ` (${diffDays}일 남음)`)}
+                  </span>
                 </div>
               </div>
-              <div className="expiry-info">
-                <CalendarDays size={14} />
-                <span>{ticket.dateRange.split('(')[0].trim()} ({ticket.dateRange.split('(')[1]}</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="stats-grid">
           <div className="stat-item">
@@ -310,14 +326,14 @@ export default function HomePage() {
               <Activity size={14} />
               <span className="label">이번 달 수강</span>
             </div>
-            <div className="value">{TICKETS[activeTicketIndex].type === 'GROUP' ? '12' : '2'}<span>회</span></div>
+            <div className="value">{TICKETS[activeTicketIndex].ticketType === 'GROUP' ? '12' : '2'}<span>회</span></div>
           </div>
           <div className="stat-item">
             <div className="label-group">
               <Trophy size={14} />
               <span className="label">평균 수강 빈도</span>
             </div>
-            <div className="value">{TICKETS[activeTicketIndex].type === 'GROUP' ? '주 2.5' : '주 1.2'}<span>회</span></div>
+            <div className="value">{TICKETS[activeTicketIndex].ticketType === 'GROUP' ? '주 2.5' : '주 1.2'}<span>회</span></div>
           </div>
         </div>
 

@@ -19,11 +19,11 @@ class NoticeService {
    * 공지 목록 조회
    * GET /notice/list?type=center|service
    */
-  async getNoticeList(type: NoticeType): Promise<ListRes<Notice> | undefined> {
+  async getNoticeList(type: NoticeType): Promise<ListRes<NoticeRes> | undefined> {
     try {
       const response: ApiResponse = await ApiInstance.get(ApiRoutes.NOTICE_LIST, { params: { type } });
       if (response && !response.hasErrors) {
-        return response.responseData as ListRes<Notice>;
+        return response.responseData as ListRes<NoticeRes>;
       }
     } catch (error) {
       console.error('[NoticeService] getNoticeList', error);

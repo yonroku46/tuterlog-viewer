@@ -41,11 +41,11 @@ class LoungeService {
    * 게시글 목록 조회
    * GET /lounge/posts?centerId=&keyword=&page=&size=
    */
-  async getPostList(params?: PostListParams): Promise<ListRes<CenterPost> | undefined> {
+  async getPostList(params?: PostListParams): Promise<ListRes<CenterPostRes> | undefined> {
     try {
       const response: ApiResponse = await ApiInstance.get(ApiRoutes.LOUNGE_POST_LIST, { params });
       if (response && !response.hasErrors) {
-        return response.responseData as ListRes<CenterPost>;
+        return response.responseData as ListRes<CenterPostRes>;
       }
     } catch (error) {
       console.error('[LoungeService] getPostList', error);
@@ -151,11 +151,11 @@ class LoungeService {
    * 댓글 목록 조회
    * GET /lounge/comments?postId=
    */
-  async getCommentList(postId: string): Promise<ListRes<CenterPostComment> | undefined> {
+  async getCommentList(postId: string): Promise<ListRes<CenterPostCommentRes> | undefined> {
     try {
       const response: ApiResponse = await ApiInstance.get(ApiRoutes.LOUNGE_COMMENT_LIST, { params: { postId } });
       if (response && !response.hasErrors) {
-        return response.responseData as ListRes<CenterPostComment>;
+        return response.responseData as ListRes<CenterPostCommentRes>;
       }
     } catch (error) {
       console.error('[LoungeService] getCommentList', error);

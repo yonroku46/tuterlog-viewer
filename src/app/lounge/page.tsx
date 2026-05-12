@@ -48,11 +48,11 @@ const LoungePost = ({
   onReport,
   onLike,
 }: {
-  post: CenterPost;
+  post: CenterPostRes;
   isReported: boolean;
-  onOpenComments: (post: CenterPost) => void;
+  onOpenComments: (post: CenterPostRes) => void;
   onReport: (id: string) => void;
-  onLike: (post: CenterPost) => void;
+  onLike: (post: CenterPostRes) => void;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [revealReported, setRevealReported] = useState(false);
@@ -97,13 +97,13 @@ const LoungePost = ({
           </div>
           <div className="meta">
             <div className="name-row">
-              <span className="author-name">{post.author}</span>
+              <span className="author-name">{post.author.name}</span>
               <span className="center-tag">
                 <MapPin size={10} />
                 {post.center}
               </span>
             </div>
-            <span className="post-date">{dayjs(post.date).fromNow()}</span>
+            <span className="post-date">{dayjs(post.createTime).fromNow()}</span>
           </div>
         </div>
         <div className="more-menu-container" ref={menuRef}>
@@ -151,7 +151,7 @@ const LoungePost = ({
 };
 
 export default function LoungePage() {
-  const [posts, setPosts] = useState<CenterPost[]>([]);
+  const [posts, setPosts] = useState<CenterPostRes[]>([]);
   const [centers, setCenters] = useState<Center[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -163,8 +163,8 @@ export default function LoungePage() {
   const [reportedIds, setReportedIds] = useState<string[]>([]);
 
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<CenterPost | null>(null);
-  const [comments, setComments] = useState<CenterPostComment[]>([]);
+  const [selectedPost, setSelectedPost] = useState<CenterPostRes | null>(null);
+  const [comments, setComments] = useState<CenterPostCommentRes[]>([]);
   const [isCommentsLoading, setIsCommentsLoading] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isSendingComment, setIsSendingComment] = useState(false);
@@ -253,7 +253,7 @@ export default function LoungePage() {
     }
   };
 
-  const handleOpenComments = async (post: CenterPost) => {
+  const handleOpenComments = async (post: CenterPostRes) => {
     setSelectedPost(post);
     setComments([]);
     setCommentDialogOpen(true);
@@ -464,7 +464,7 @@ export default function LoungePage() {
                 <div className="avatar">
                   <User size={14} />
                 </div>
-                <span className="name">{selectedPost.author}</span>
+                <span className="name">{selectedPost.author.name}</span>
                 <span className="center">
                   {selectedPost.center.split('TuterLog ')[1] || selectedPost.center}
                 </span>
@@ -484,8 +484,8 @@ export default function LoungePage() {
                   </div>
                   <div className="comment-content-wrap">
                     <div className="comment-meta">
-                      <span className="comment-author">{comment.author}</span>
-                      <span className="comment-date">{dayjs(comment.date).fromNow()}</span>
+                      <span className="comment-author">{comment.author.name}</span>
+                      <span className="comment-date">{dayjs(comment.createTime).fromNow()}</span>
                     </div>
                     <p className="comment-text">{comment.content}</p>
                   </div>
