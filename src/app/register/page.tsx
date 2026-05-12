@@ -94,13 +94,19 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     try {
-      await register({
+      const res = await register({
         name: formData.name,
         email: formData.email,
         password: formData.password
       });
+
+      if (res && res.success) {
+        alert('회원가입이 완료되었습니다. 로그인해주세요.');
+        router.push('/login');
+      }
     } catch (err) {
-      setError('회원가입에 실패했습니다. 다시 시도해주세요.');
+      const msg = '회원가입에 실패했습니다. 다시 시도해주세요.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -201,11 +207,11 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {error && <p className="error-message" style={{ color: '#ff4d4d', fontSize: '0.875rem', textAlign: 'center' }}>{error}</p>}
-
           <button type="submit" className="register-button" disabled={isLoading}>
             {isLoading ? '가입 중...' : '회원가입'}
           </button>
+
+          {error && <p className="error-message">{error}</p>}
         </form>
 
         <div className="register-footer">

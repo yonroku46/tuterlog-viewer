@@ -36,7 +36,8 @@ export default function ForgotPasswordPage() {
       setStep(2);
       setTimer(180);
     } catch (err) {
-      setError('인증번호 전송에 실패했습니다.');
+      const msg = '인증번호 전송에 실패했습니다.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +55,8 @@ export default function ForgotPasswordPage() {
         setError('인증번호가 일치하지 않습니다.');
       }
     } catch (err) {
-      setError('인증 확인 중 오류가 발생했습니다.');
+      const msg = '인증 확인 중 오류가 발생했습니다.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +75,8 @@ export default function ForgotPasswordPage() {
       alert('비밀번호가 성공적으로 변경되었습니다.');
       router.replace('/login');
     } catch (err) {
-      setError('비밀번호 재설정에 실패했습니다.');
+      const msg = '비밀번호 재설정에 실패했습니다.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -164,10 +167,11 @@ export default function ForgotPasswordPage() {
                 required
               />
             </div>
-            {error && <p className="error-message">{error}</p>}
             <button type="submit" className="forgot-password-button" disabled={isLoading}>
               {isLoading ? '변경 중...' : '비밀번호 변경'}
             </button>
+
+            {error && <p className="error-message">{error}</p>}
           </form>
         )}
 

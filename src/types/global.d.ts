@@ -155,10 +155,14 @@ declare global {
     range: [number, number];
   }
   // API Response
-  interface PaymentRes {
-    orderId: string;
-    success: boolean;
-    redirectUri?: string;
+  export interface LoginUserRes {
+    userId: string;
+    name: string;
+    profileImg: string;
+    email: string;
+    gender: string;
+    token: string;
+    refreshToken: string;
   }
   // DB
   interface UserProfile {

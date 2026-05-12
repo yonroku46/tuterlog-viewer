@@ -1,12 +1,6 @@
 import ApiInstance from '@/api';
 import ApiRoutes from '@/api/module/ApiRoutes';
 
-export interface AuthRes {
-  user: UserProfile;
-  token: string;
-  refreshToken: string;
-}
-
 class AuthService {
   private static instance: AuthService;
 
@@ -23,12 +17,13 @@ class AuthService {
    * 로그인
    * POST /auth/login
    */
-  async login(email: string, password: string): Promise<AuthRes | undefined> {
+  async login(email: string, password: string): Promise<LoginUserRes | undefined> {
     try {
       const response: ApiResponse = await ApiInstance.post(ApiRoutes.AUTH_LOGIN, { email, password });
       if (response && !response.hasErrors) {
-        return response.responseData as AuthRes;
+        return response.responseData as LoginUserRes;
       }
+      throw new Error(response?.informations?.[0]?.message || 'Login failed');
     } catch (error) {
       console.error('[AuthService] login', error);
       throw error;
@@ -39,12 +34,13 @@ class AuthService {
    * 회원가입
    * POST /auth/register
    */
-  async register(data: any): Promise<AuthRes | undefined> {
+  async register(data: any): Promise<ActionRes | undefined> {
     try {
       const response: ApiResponse = await ApiInstance.post(ApiRoutes.AUTH_REGISTER, data);
       if (response && !response.hasErrors) {
-        return response.responseData as AuthRes;
+        return response.responseData as ActionRes;
       }
+      throw new Error(response?.informations?.[0]?.message || 'Registration failed');
     } catch (error) {
       console.error('[AuthService] register', error);
       throw error;
@@ -61,6 +57,7 @@ class AuthService {
       if (response && !response.hasErrors) {
         return response.responseData as ActionRes;
       }
+      throw new Error(response?.informations?.[0]?.message || 'Failed to send verification code');
     } catch (error) {
       console.error('[AuthService] sendVerificationCode', error);
       throw error;
@@ -77,6 +74,7 @@ class AuthService {
       if (response && !response.hasErrors) {
         return response.responseData as ActionRes;
       }
+      throw new Error(response?.informations?.[0]?.message || 'Invalid verification code');
     } catch (error) {
       console.error('[AuthService] verifyCode', error);
       throw error;
@@ -92,6 +90,7 @@ class AuthService {
       if (response && !response.hasErrors) {
         return response.responseData as ActionRes;
       }
+      throw new Error(response?.informations?.[0]?.message || 'Failed to request password reset');
     } catch (error) {
       console.error('[AuthService] forgotPassword', error);
       throw error;
@@ -107,6 +106,7 @@ class AuthService {
       if (response && !response.hasErrors) {
         return response.responseData as ActionRes;
       }
+      throw new Error(response?.informations?.[0]?.message || 'Failed to reset password');
     } catch (error) {
       console.error('[AuthService] resetPassword', error);
       throw error;
@@ -123,6 +123,7 @@ class AuthService {
       if (response && !response.hasErrors) {
         return response.responseData as { token: string };
       }
+      throw new Error(response?.informations?.[0]?.message || 'Token refresh failed');
     } catch (error) {
       console.error('[AuthService] refresh', error);
       throw error;

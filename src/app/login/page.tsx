@@ -24,7 +24,8 @@ export default function LoginPage() {
     try {
       await login(email, password);
     } catch (err) {
-      setError('로그인에 실패했습니다. 정보를 확인해주세요.');
+      const msg = '로그인에 실패했습니다. 정보를 확인해주세요.';
+      setError(msg);
     }
   };
 
@@ -76,11 +77,11 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {error && <p className="error-message" style={{ color: '#ff4d4d', fontSize: '0.875rem', textAlign: 'center' }}>{error}</p>}
-
           <button type="submit" className="login-button" disabled={isLoading}>
             {isLoading ? '로그인 중...' : '로그인'}
           </button>
+
+          {error && <p className="error-message">{error}</p>}
         </form>
 
         <div className="login-footer">

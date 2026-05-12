@@ -109,7 +109,6 @@
         justify-content: space-between;
         padding: 0 0.5rem;
         margin-top: 0.5rem;
-        margin-bottom: -1rem;
 
         .remember-me {
           display: flex;
@@ -188,6 +187,13 @@
             background: rgba(var(--primary-rgb), 0.05);
           }
         }
+      }
+
+      .error-message {
+        color: #ff4d4d;
+        font-size: 0.875rem;
+        text-align: center;
+        margin-top: -0.5rem;
       }
 
       .login-button {

@@ -2,13 +2,12 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-
-import AuthService, { AuthRes } from '@/api/service/AuthService';
+import AuthService from '@/api/service/AuthService';
 
 interface AuthContextType {
-  user: UserProfile | null;
+  user: LoginUserRes | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  register: (data: any) => Promise<ActionRes | undefined>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -16,7 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<LoginUserRes | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -31,8 +30,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const stored = localStorage.getItem('currentUser');
         if (stored) {
-          const authData: AuthRes = JSON.parse(stored);
-          setUser(authData.user);
+          const authData: LoginUserRes = JSON.parse(stored);
+          setUser(authData);
         }
       } catch (error) {
         console.error('Failed to parse user data:', error);
@@ -62,8 +61,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await AuthService.login(email, password);
       if (res) {
         localStorage.setItem('currentUser', JSON.stringify(res));
-        setUser(res.user);
+        setUser(res);
         router.replace('/');
+      } else {
+        throw new Error('Login failed');
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -73,15 +74,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (data: any) => {
+  const register = async (data: any): Promise<ActionRes | undefined> => {
     setIsLoading(true);
     try {
       const res = await AuthService.register(data);
-      if (res) {
-        localStorage.setItem('currentUser', JSON.stringify(res));
-        setUser(res.user);
-        router.replace('/');
-      }
+      return res;
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
