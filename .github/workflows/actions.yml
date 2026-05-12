@@ -26,7 +26,7 @@ jobs:
       - name: Update environment variables
         run: |
           ssh ubuntu@${{ secrets.SERVER_IP }} "
-            cd $REPO_PATH &&
+            cd $REPO_PATH
           "
 
       - name: Install dependencies
