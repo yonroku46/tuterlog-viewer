@@ -10,7 +10,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [stayLoggedIn, setStayLoggedIn] = useState(true);
   const [error, setError] = useState('');
-  const { login, isLoading } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,11 +22,14 @@ export default function LoginPage() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      await login(email, password);
+      await login(email, password, stayLoggedIn);
     } catch (err) {
       const msg = '로그인에 실패했습니다. 정보를 확인해주세요.';
       setError(msg);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -77,8 +81,8 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <button type="submit" className="login-button" disabled={isLoading}>
-            {isLoading ? '로그인 중...' : '로그인'}
+          <button type="submit" className="login-button" disabled={isSubmitting}>
+            {isSubmitting ? '로그인 중...' : '로그인'}
           </button>
 
           {error && <p className="error-message">{error}</p>}

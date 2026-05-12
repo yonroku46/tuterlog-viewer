@@ -6,7 +6,7 @@ import AuthService from '@/api/service/AuthService';
 
 interface AuthContextType {
   user: LoginUserRes | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, stayLoggedIn?: boolean) => Promise<void>;
   register: (data: any) => Promise<ActionRes | undefined>;
   logout: () => void;
   isLoading: boolean;
@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const checkAuth = async () => {
       setIsLoading(true);
       try {
-        const stored = localStorage.getItem('currentUser');
+        const stored = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
         if (stored) {
           const authData: LoginUserRes = JSON.parse(stored);
           setUser(authData);
@@ -55,12 +55,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, isLoading, pathname, router]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, stayLoggedIn: boolean = true) => {
     setIsLoading(true);
     try {
       const res = await AuthService.login(email, password);
       if (res) {
-        localStorage.setItem('currentUser', JSON.stringify(res));
+        const storage = stayLoggedIn ? localStorage : sessionStorage;
+        storage.setItem('currentUser', JSON.stringify(res));
         setUser(res);
         router.replace('/');
       } else {
@@ -89,13 +90,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('currentUser');
+    sessionStorage.removeItem('currentUser');
     setUser(null);
     router.replace('/login');
   };
 
+  const isPublicPath = publicPaths.includes(pathname);
+  const showLoading = isLoading || (!user && !isPublicPath) || (user && isPublicPath);
+
   return (
     <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
-      {children}
+      {showLoading ? (
+        <div className="auth-loading-screen">
+          <div className="loader"></div>
+          <p>사용자 정보를 확인 중입니다...</p>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 }
