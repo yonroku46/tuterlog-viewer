@@ -16,6 +16,9 @@ const BottomNav = () => {
     { label: '공지', icon: Megaphone, href: '/notice' },
   ];
 
+  const hidePaths = ['/login', '/register', '/forgot-password'];
+  if (hidePaths.includes(pathname)) return null;
+
   return (
     <nav className="bottom-nav">
       {navItems.map((item) => {

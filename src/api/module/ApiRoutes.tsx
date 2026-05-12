@@ -27,7 +27,24 @@ const PROFILE_PRODUCTS = `${PROFILE_ROOT}/products`;
 const PROFILE_HISTORY = `${PROFILE_ROOT}/history`;
 const PROFILE_NOTIFICATION = `${PROFILE_ROOT}/notification-settings`;
 
+// auth
+const AUTH_ROOT = `${ROOT}/auth`;
+const AUTH_LOGIN = `${AUTH_ROOT}/login`;
+const AUTH_REGISTER = `${AUTH_ROOT}/register`;
+const AUTH_REFRESH = `${AUTH_ROOT}/refresh`;
+const AUTH_VERIFY_SEND = `${AUTH_ROOT}/verify/send`;
+const AUTH_VERIFY_CONFIRM = `${AUTH_ROOT}/verify/confirm`;
+const AUTH_FORGOT_PASSWORD = `${AUTH_ROOT}/forgot-password`;
+const AUTH_RESET_PASSWORD = `${AUTH_ROOT}/reset-password`;
+
 const ApiRoutes = {
+  AUTH_LOGIN,
+  AUTH_REGISTER,
+  AUTH_REFRESH,
+  AUTH_VERIFY_SEND,
+  AUTH_VERIFY_CONFIRM,
+  AUTH_FORGOT_PASSWORD,
+  AUTH_RESET_PASSWORD,
   LOUNGE_POST_LIST,
   LOUNGE_POST,
   LOUNGE_POST_LIKE,

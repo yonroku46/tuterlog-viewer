@@ -5,10 +5,12 @@ import { usePathname } from 'next/navigation';
 import { Bell } from 'lucide-react';
 import SlideDialog from '@/components/dialog/SlideDialog';
 import NotificationList from '@/components/contents/NotificationList';
+import { useAuth } from '@/providers/AuthProvider';
 import './Header.scss';
 
 const Header = () => {
   const pathname = usePathname();
+  const { user } = useAuth();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const [selectedCenter, setSelectedCenter] = useState('전체 센터');
@@ -24,7 +26,7 @@ const Header = () => {
   const getPageConfig = (path: string) => {
     switch (path) {
       case '/':
-        const userName = '홍길동';
+        const userName = user?.name || '사용자';
         return { title: `안녕하세요, ${userName}님!` };
       case '/lounge':
         return { title: '라운지' };

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
-type MetadataType = 'home' | 'notice' | 'reserve' | 'tickets' | 'profile' | 'lounge';
+type MetadataType = 'home' | 'notice' | 'reserve' | 'tickets' | 'profile' | 'lounge' | 'login' | 'register' | 'forgot-password';
 
 const APP_NAME = "TuterLog";
 const APP_DESCRIPTION = "선생님과 학생의 더 효율적인 클래스 관리를 돕는 스마트 매니저";
@@ -30,6 +30,18 @@ const PAGE_INFO: Record<MetadataType, { title: string; description?: string }> =
   lounge: {
     title: '라운지',
     description: '센터 회원들과 소통하고 정보를 공유하는 커뮤니티 공간입니다.'
+  },
+  login: {
+    title: '로그인',
+    description: `${APP_NAME} 계정으로 로그인하여 서비스를 이용하세요.`
+  },
+  register: {
+    title: '회원가입',
+    description: `${APP_NAME}의 새로운 회원이 되어 스마트한 클래스 관리를 시작하세요.`
+  },
+  'forgot-password': {
+    title: '비밀번호 찾기',
+    description: '잊으신 비밀번호를 안전하게 찾고 재설정하세요.'
   }
 };
 

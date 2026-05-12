@@ -8,10 +8,12 @@ import LoadingSpinner from '@/components/contents/LoadingSpinner';
 import EmptyState from '@/components/contents/EmptyState';
 import Skeleton from '@/components/contents/Skeleton';
 import ProfileService from '@/api/service/ProfileService';
+import { useAuth } from '@/providers/AuthProvider';
 import './Profile.scss';
 
 export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { logout } = useAuth();
   const [activeMenu, setActiveMenu] = useState<ProfileMenuType>(null);
   const [language, setLanguage] = useState('ko');
 
@@ -270,7 +272,7 @@ export default function ProfilePage() {
                   </div>
                   <ChevronRight size={18} />
                 </button>
-                <button className="menu-item logout">
+                <button className="menu-item logout" onClick={logout}>
                   <div className="left">
                     <div className="icon-wrapper"><LogOut size={20} /></div>
                     <span>로그아웃</span>

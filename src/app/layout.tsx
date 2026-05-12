@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import BottomNav from "@/components/layout/BottomNav";
 import Header from "@/components/layout/Header";
 import ScrollToTop from "@/components/layout/ScrollToTop";
+import { AuthProvider } from '@/providers/AuthProvider';
 import "@/styles/globals.scss";
 
 const geistSans = Geist({
@@ -25,14 +26,16 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <ScrollToTop />
-        <main>
-          <div className="content-area">
-            <Header />
-            {children}
-          </div>
-          <BottomNav />
-        </main>
+        <AuthProvider>
+          <ScrollToTop />
+          <main>
+            <div className="content-area">
+              <Header />
+              {children}
+            </div>
+            <BottomNav />
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );

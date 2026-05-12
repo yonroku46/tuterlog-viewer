@@ -4,6 +4,10 @@
   --text-primary: #111111;
   --text-secondary: #8e8e93;
   --border: #e5e5ea;
+  --primary-color: #007aff;
+  --primary-rgb: 0, 122, 255;
+  --primary-dark: #0062cc;
+  --secondary-rgb: 88, 86, 214;
 }
 
 * {
@@ -50,12 +54,14 @@ button {
 
 .content-area {
   flex: 1;
-  overflow-y: auto;
   overflow-x: hidden;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 
-  &::-webkit-scrollbar {
-    width: 0.3125rem;
+  @media (max-width: 480px) {
+    &::-webkit-scrollbar {
+      width: 0;
+    }
   }
 
   &::-webkit-scrollbar-track {
