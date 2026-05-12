@@ -69,11 +69,11 @@ button {
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.025);
     border-radius: 0.625rem;
     
     &:hover {
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.05);
     }
   }
 }

@@ -3,12 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bell, Pencil, Smile, Building2, CreditCard, Package, Search, ChevronRight, Settings, ShieldCheck, HelpCircle, LogOut, Globe, Check, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
+import dayjs from 'dayjs';
 import SlideDialog from '@/components/dialog/SlideDialog';
 import LoadingSpinner from '@/components/contents/LoadingSpinner';
 import EmptyState from '@/components/contents/EmptyState';
 import Skeleton from '@/components/contents/Skeleton';
 import ProfileService from '@/api/service/ProfileService';
 import { useAuth } from '@/providers/AuthProvider';
+import { CONTENT_TYPE_LABELS, CONTENT_TYPE_COLORS } from '@/common/constants';
 import './Profile.scss';
 
 export default function ProfilePage() {
@@ -174,9 +176,11 @@ export default function ProfilePage() {
           <div className="history-list">
             {tickets.length > 0 ? tickets.map(item => (
               <div key={item.historyId} className="history-item">
-                <div className="date">{item.createTime}</div>
+                <div className="date">{dayjs(item.createTime).format('YYYY.MM.DD HH:mm')}</div>
                 <div className="content">
-                  <div className="type">{item.contentType}</div>
+                  <div className="type" style={{ color: CONTENT_TYPE_COLORS[item.contentType] }}>
+                    {CONTENT_TYPE_LABELS[item.contentType] || item.contentType}
+                  </div>
                   <div className="detail">{item.contentDetail}</div>
                 </div>
               </div>
@@ -189,9 +193,11 @@ export default function ProfilePage() {
           <div className="history-list">
             {products.length > 0 ? products.map(item => (
               <div key={item.historyId} className="history-item">
-                <div className="date">{item.createTime}</div>
+                <div className="date">{dayjs(item.createTime).format('YYYY.MM.DD HH:mm')}</div>
                 <div className="content">
-                  <div className="type">{item.contentType}</div>
+                  <div className="type" style={{ color: CONTENT_TYPE_COLORS[item.contentType] }}>
+                    {CONTENT_TYPE_LABELS[item.contentType] || item.contentType}
+                  </div>
                   <div className="detail">{item.contentDetail}</div>
                 </div>
               </div>
@@ -204,9 +210,11 @@ export default function ProfilePage() {
           <div className="history-list">
             {history.length > 0 ? history.map(item => (
               <div key={item.historyId} className="history-item">
-                <div className="date">{item.createTime}</div>
+                <div className="date">{dayjs(item.createTime).format('YYYY.MM.DD HH:mm')}</div>
                 <div className="content">
-                  <div className="type">{item.contentType}</div>
+                  <div className="type" style={{ color: CONTENT_TYPE_COLORS[item.contentType] }}>
+                    {CONTENT_TYPE_LABELS[item.contentType] || item.contentType}
+                  </div>
                   <div className="detail">{item.contentDetail}</div>
                 </div>
               </div>

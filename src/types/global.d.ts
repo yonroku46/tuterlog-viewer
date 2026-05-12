@@ -26,6 +26,7 @@ declare global {
   }
   // Business
   type TicketType = 'GROUP' | 'PT';
+  type ContentType = 'TICKET' | 'PRODUCT' | 'RESERVATION' | 'CENTER';
   type NotificationIconType = 'LOGO' | 'AVATAR';
   type ReservationStatus = 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NOSHOW' | 'WAITING';
   type ProfileMenuType = 'CENTER' | 'EDIT_PROFILE' | 'TICKET' | 'PRODUCT' | 'HISTORY' | 'NOTICE_SETTING' | 'SYSTEM_SETTING' | null;
@@ -183,7 +184,7 @@ declare global {
   }
   interface UsageHistoryItem {
     historyId: string;
-    contentType: string;
+    contentType: ContentType;
     contentDetail: string;
     createTime: string;
   }

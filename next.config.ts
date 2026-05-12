@@ -30,6 +30,14 @@ const nextConfig = {
         source: '/ogp',
         destination: '/api/ogp',
       },
+      {
+        source: '/dev/:path*',
+        destination: `https://${process.env.NEXT_PUBLIC_S3_PREFIX}/dev/:path*`
+      },
+      {
+        source: '/prod/:path*',
+        destination: `https://${process.env.NEXT_PUBLIC_S3_PREFIX}/prod/:path*`
+      },
     ];
   },
   typescript: {
