@@ -30,7 +30,7 @@ jobs:
           "
 
       - name: Install dependencies
-        run: ssh ubuntu@${{ secrets.SERVER_IP }} "cd $REPO_PATH && yarn install"
+        run: ssh ubuntu@${{ secrets.SERVER_IP }} "cd $REPO_PATH && yarn install --ignore-engines"
 
       - name: Build
         run: ssh ubuntu@${{ secrets.SERVER_IP }} "cd $REPO_PATH && yarn build"
