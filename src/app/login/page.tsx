@@ -3,31 +3,31 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
 import Link from 'next/link';
+import { useSnackbar } from 'notistack';
 import './Login.scss';
 
 export default function LoginPage() {
+  const { login } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [stayLoggedIn, setStayLoggedIn] = useState(true);
-  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     
     if (!email || !password) {
-      setError('이메일과 비밀번호를 입력해주세요.');
+      enqueueSnackbar('이메일과 비밀번호를 입력해주세요.', { variant: 'warning' });
       return;
     }
 
     setIsSubmitting(true);
     try {
       await login(email, password, stayLoggedIn);
-    } catch (err) {
-      const msg = '로그인에 실패했습니다. 정보를 확인해주세요.';
-      setError(msg);
+      enqueueSnackbar('로그인되었습니다.', { variant: 'success' });
+    } catch (err: any) {
+      enqueueSnackbar(err.message || '로그인에 실패했습니다. 정보를 확인해주세요.', { variant: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -84,8 +84,6 @@ export default function LoginPage() {
           <button type="submit" className="login-button" disabled={isSubmitting}>
             {isSubmitting ? '로그인 중...' : '로그인'}
           </button>
-
-          {error && <p className="error-message">{error}</p>}
         </form>
 
         <div className="login-footer">

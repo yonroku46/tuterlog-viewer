@@ -29,7 +29,7 @@ declare global {
   type ContentType = 'TICKET' | 'PRODUCT' | 'RESERVATION' | 'CENTER';
   type NotificationIconType = 'LOGO' | 'AVATAR';
   type ReservationStatus = 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NOSHOW' | 'WAITING';
-  type ProfileMenuType = 'CENTER' | 'EDIT_PROFILE' | 'TICKET' | 'PRODUCT' | 'HISTORY' | 'NOTICE_SETTING' | 'SYSTEM_SETTING' | null;
+  type ProfileMenuType = 'CENTER' | 'EDIT_PROFILE' | 'TICKET' | 'PRODUCT' | 'HISTORY' | 'NOTICE_SETTING' | 'SYSTEM_SETTING' | 'PRIVACY' | 'CUSTOMER_CENTER' | null;
   interface Ticket {
     ticketId: string;
     userId?: string;

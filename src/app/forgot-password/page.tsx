@@ -4,9 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AuthService from '@/api/service/AuthService';
+import { useSnackbar } from 'notistack';
 import './ForgotPassword.scss';
 
 export default function ForgotPasswordPage() {
+  const { enqueueSnackbar } = useSnackbar();
   const [step, setStep] = useState(1); // 1: Email, 2: Verification, 3: New Password
   const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
@@ -14,7 +16,6 @@ export default function ForgotPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [timer, setTimer] = useState(180);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -29,15 +30,14 @@ export default function ForgotPasswordPage() {
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
     try {
       await AuthService.forgotPassword(email);
       setStep(2);
       setTimer(180);
-    } catch (err) {
-      const msg = '인증번호 전송에 실패했습니다.';
-      setError(msg);
+      enqueueSnackbar('인증번호가 전송되었습니다.', { variant: 'success' });
+    } catch (err: any) {
+      enqueueSnackbar(err.message || '인증번호 전송에 실패했습니다.', { variant: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -45,18 +45,21 @@ export default function ForgotPasswordPage() {
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    if (timer <= 0) {
+      enqueueSnackbar('인증 시간이 만료되었습니다. 인증번호를 다시 받아주세요.', { variant: 'warning' });
+      return;
+    }
     setIsLoading(true);
     try {
       const res = await AuthService.verifyCode(email, verificationCode);
       if (res?.success) {
         setStep(3);
+        enqueueSnackbar('인증되었습니다.', { variant: 'success' });
       } else {
-        setError('인증번호가 일치하지 않습니다.');
+        enqueueSnackbar('인증번호가 일치하지 않습니다.', { variant: 'error' });
       }
-    } catch (err) {
-      const msg = '인증 확인 중 오류가 발생했습니다.';
-      setError(msg);
+    } catch (err: any) {
+      enqueueSnackbar(err.message || '인증 확인 중 오류가 발생했습니다.', { variant: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -64,19 +67,17 @@ export default function ForgotPasswordPage() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     if (newPassword !== confirmPassword) {
-      setError('비밀번호가 일치하지 않습니다.');
+      enqueueSnackbar('비밀번호가 일치하지 않습니다.', { variant: 'warning' });
       return;
     }
     setIsLoading(true);
     try {
       await AuthService.resetPassword({ email, verificationCode, newPassword });
-      alert('비밀번호가 성공적으로 변경되었습니다.');
+      enqueueSnackbar('비밀번호가 성공적으로 변경되었습니다.', { variant: 'success' });
       router.replace('/login');
-    } catch (err) {
-      const msg = '비밀번호 재설정에 실패했습니다.';
-      setError(msg);
+    } catch (err: any) {
+      enqueueSnackbar(err.message || '비밀번호 재설정에 실패했습니다.', { variant: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +108,6 @@ export default function ForgotPasswordPage() {
                 required
               />
             </div>
-            {error && <p className="error-message">{error}</p>}
             <button type="submit" className="forgot-password-button" disabled={isLoading}>
               {isLoading ? '전송 중...' : '인증번호 받기'}
             </button>
@@ -122,19 +122,23 @@ export default function ForgotPasswordPage() {
                 <input
                   id="code"
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="6자리 번호 입력"
                   value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    setVerificationCode(value);
+                  }}
                   maxLength={6}
                   required
                 />
-                <span className="timer">
-                  {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
+                <span className={`timer ${timer === 0 ? 'expired' : ''}`}>
+                  {timer === 0 ? '만료' : `${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')}`}
                 </span>
               </div>
             </div>
-            {error && <p className="error-message">{error}</p>}
-            <button type="submit" className="forgot-password-button" disabled={isLoading}>
+            <button type="submit" className="forgot-password-button" disabled={isLoading || timer <= 0}>
               {isLoading ? '확인 중...' : '인증번호 확인'}
             </button>
             <button type="button" className="resend-btn" onClick={handleSendCode}>
@@ -170,8 +174,6 @@ export default function ForgotPasswordPage() {
             <button type="submit" className="forgot-password-button" disabled={isLoading}>
               {isLoading ? '변경 중...' : '비밀번호 변경'}
             </button>
-
-            {error && <p className="error-message">{error}</p>}
           </form>
         )}
 

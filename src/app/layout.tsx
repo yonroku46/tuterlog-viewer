@@ -4,6 +4,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import Header from "@/components/layout/Header";
 import ScrollToTop from "@/components/layout/ScrollToTop";
 import { AuthProvider } from '@/providers/AuthProvider';
+import SnackbarProvider from '@/providers/SnackbarProvider';
 import "@/styles/globals.scss";
 
 const geistSans = Geist({
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <AuthProvider>
+          <SnackbarProvider>
           <ScrollToTop />
           <main>
             <div className="content-area">
@@ -35,6 +37,7 @@ export default function RootLayout({
             </div>
             <BottomNav />
           </main>
+          </SnackbarProvider>
         </AuthProvider>
       </body>
     </html>

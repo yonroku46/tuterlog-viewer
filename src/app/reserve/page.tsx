@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Image from 'next/image';
 import Calendar from 'react-calendar';
 import { User, Users, ChevronLeft, ChevronRight, Clock, MapPin, CheckCircle2, Check } from 'lucide-react';
+import { useSnackbar } from 'notistack';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import SlideDialog from '@/components/dialog/SlideDialog';
+import AppImage from '@/components/contents/AppImage';
 import './Reserve.scss';
 
 dayjs.locale('ko');
@@ -57,7 +58,7 @@ export default function ReservePage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState<ClassInfo | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [imageError, setImageError] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const filteredClasses = useMemo(() => {
     const filter = TIME_FILTERS.find(f => f.option === timeFilter);
@@ -75,7 +76,6 @@ export default function ReservePage() {
 
   const handleClassClick = (cls: typeof CLASSES[0]) => {
     setSelectedClass(cls);
-    setImageError(false);
     setIsDetailOpen(true);
   };
 
@@ -190,7 +190,7 @@ export default function ReservePage() {
             className={`reserve-action-btn ${selectedClass.reserved >= selectedClass.capacity ? 'is-full' : ''}`} 
             onClick={() => {
               const msg = selectedClass.reserved < selectedClass.capacity ? '예약이 완료되었습니다.' : '대기 신청이 완료되었습니다.';
-              alert(msg);
+              enqueueSnackbar(msg, { variant: 'success' });
               setIsDetailOpen(false);
             }}
           >
@@ -202,19 +202,17 @@ export default function ReservePage() {
           <div className="class-detail-view">
             <div className="detail-header">
               <div className="img-box">
-                {selectedClass.image && !imageError ? (
-                  <Image 
-                    src={selectedClass.image} 
-                    alt={selectedClass.instructor.name} 
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <div className="fallback-icon">
-                    <User size={24} color="#aeaeb2" />
-                  </div>
-                )}
+                <AppImage 
+                  src={selectedClass.image} 
+                  alt={selectedClass.instructor.name} 
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  fallback={
+                    <div className="fallback-icon">
+                      <User size={24} color="#aeaeb2" />
+                    </div>
+                  }
+                />
               </div>
               <div className="info-box">
                 <h2>{selectedClass.name}</h2>

@@ -2,7 +2,9 @@
 
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { User, ChevronDown, Check, MapPin, AlertCircle, Trash2, MoreVertical, CalendarDays, Trophy, Activity } from 'lucide-react';
+import { useSnackbar } from 'notistack';
 import SlideDialog from '@/components/dialog/SlideDialog';
+import AppImage from '@/components/contents/AppImage';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import './Home.scss';
@@ -50,7 +52,7 @@ const ReservedCard = ({
 }: { 
   reservation: Reservation; 
   showCancel?: boolean;
-  onCancel?: (id: string) => void;
+  onCancel?: (res: Reservation) => void;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -91,13 +93,7 @@ const ReservedCard = ({
             {isMenuOpen && (
               <div className="menu-dropdown">
                 <button onClick={() => {
-                  const isToday = dayjs(reservation.reservationDate).isSame(dayjs(), 'day');
-                  if (isToday) {
-                    alert('당일 수업은 취소가 불가능합니다.');
-                    setIsMenuOpen(false);
-                    return;
-                  }
-                  onCancel?.(reservation.reservationId);
+                  onCancel?.(reservation);
                   setIsMenuOpen(false);
                 }}>
                   <Trash2 size={14} />
@@ -110,11 +106,18 @@ const ReservedCard = ({
       </div>
       <div className="class-info">
         <div className="instructor-img">
-          {reservation.instructor ? (
-            <div className="fallback-icon">
-              <User size={20} color="#aeaeb2" />
-            </div>
-          ) : null}
+          <AppImage 
+            src={reservation.instructor?.profileImg} 
+            alt={reservation.instructor?.name} 
+            width={40} 
+            height={40} 
+            style={{ borderRadius: '50%', objectFit: 'cover' }}
+            fallback={
+              <div className="fallback-icon">
+                <User size={20} color="#aeaeb2" />
+              </div>
+            }
+          />
         </div>
         <div className="details">
           <p className="title">{reservation.className}</p>
@@ -136,6 +139,7 @@ export default function HomePage() {
   const [isAllReservationsOpen, setIsAllReservationsOpen] = useState(false);
   const [activeTicketIndex, setActiveTicketIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
+  const { enqueueSnackbar } = useSnackbar();
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const dateScrollRef = useRef<HTMLDivElement>(null);
@@ -189,9 +193,15 @@ export default function HomePage() {
     setIsCenterDialogOpen(false);
   };
 
-  const handleCancel = (id: string) => {
+  const handleCancel = (res: Reservation) => {
+    const isToday = dayjs(res.reservationDate).isSame(dayjs(), 'day');
+    if (isToday) {
+      enqueueSnackbar('당일 수업은 취소가 불가능합니다.', { variant: 'warning' });
+      return;
+    }
+
     if (confirm('이 예약을 취소하시겠습니까?')) {
-      alert('취소되었습니다.');
+      enqueueSnackbar('취소되었습니다.', { variant: 'success' });
     }
   };
 

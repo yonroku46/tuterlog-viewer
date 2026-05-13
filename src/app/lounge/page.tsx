@@ -3,7 +3,9 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Heart, MessageCircle, MoreHorizontal, User, Search, MapPin, AlertCircle, Send, Image as ImageIcon, Flag, Eye, PenSquare, ChevronDown, X, Loader2 } from 'lucide-react';
+import { useSnackbar } from 'notistack';
 import SlideDialog from '@/components/dialog/SlideDialog';
+import AppImage from '@/components/contents/AppImage';
 import LoadingSpinner from '@/components/contents/LoadingSpinner';
 import EmptyState from '@/components/contents/EmptyState';
 import LoungeService from '@/api/service/LoungeService';
@@ -16,26 +18,20 @@ dayjs.extend(relativeTime);
 dayjs.locale('ko');
 
 const SafeImage = ({ src, alt }: { src: string; alt: string }) => {
-  const [error, setError] = useState(false);
-
-  if (error) {
-    return (
-      <div className="image-error-fallback">
-        <ImageIcon size={40} />
-        <span>이미지를 불러올 수 없습니다</span>
-      </div>
-    );
-  }
-
   return (
     <div style={{ position: 'relative', width: '100%', height: '13rem' }}>
-      <Image
+      <AppImage
         src={src}
         alt={alt}
         fill
         sizes="(max-width: 480px) 100vw, 480px"
         style={{ objectFit: 'cover' }}
-        onError={() => setError(true)}
+        fallback={
+          <div className="image-error-fallback">
+            <ImageIcon size={40} />
+            <span>이미지를 불러올 수 없습니다</span>
+          </div>
+        }
       />
     </div>
   );
@@ -93,7 +89,14 @@ const LoungePost = ({
       <div className="post-header">
         <div className="author-info">
           <div className="author-avatar">
-            <User size={20} />
+            <AppImage 
+              src={post.author.profileImg} 
+              alt={post.author.name} 
+              width={32} 
+              height={32} 
+              style={{ borderRadius: '50%', objectFit: 'cover' }}
+              fallback={<User size={20} />}
+            />
           </div>
           <div className="meta">
             <div className="name-row">
@@ -168,6 +171,7 @@ export default function LoungePage() {
   const [isCommentsLoading, setIsCommentsLoading] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isSendingComment, setIsSendingComment] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const [isWriteDialogOpen, setIsWriteDialogOpen] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
@@ -288,9 +292,9 @@ export default function LoungePage() {
           )
         );
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('댓글 작성 실패', err);
-      alert('댓글 작성에 실패했습니다. 다시 시도해주세요.');
+      enqueueSnackbar(err.message || '댓글 작성에 실패했습니다. 다시 시도해주세요.', { variant: 'error' });
     } finally {
       setIsSendingComment(false);
     }
@@ -303,14 +307,14 @@ export default function LoungePage() {
         const updated = [...reportedIds, id];
         setReportedIds(updated);
         localStorage.setItem('reported_post_ids', JSON.stringify(updated));
-        alert('신고가 접수되었습니다. 해당 게시글은 이제 숨겨집니다.');
+        enqueueSnackbar('신고가 접수되었습니다. 해당 게시글은 이제 숨겨집니다.', { variant: 'success' });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('신고 실패', err);
       const updated = [...reportedIds, id];
       setReportedIds(updated);
       localStorage.setItem('reported_post_ids', JSON.stringify(updated));
-      alert('신고가 접수되었습니다. 해당 게시글은 이제 숨겨집니다.');
+      enqueueSnackbar('신고가 접수되었습니다. 해당 게시글은 이제 숨겨집니다.', { variant: 'success' });
     }
   };
 
@@ -341,13 +345,13 @@ export default function LoungePage() {
         imageFiles: newPostImages.map(i => i.file),
       });
       if (res?.success !== false) {
-        alert('게시글이 등록되었습니다.');
+        enqueueSnackbar('게시글이 등록되었습니다.', { variant: 'success' });
         resetWriteDialog();
         await fetchPosts(selectedCenter, searchQuery);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('게시글 작성 실패', err);
-      alert('게시글 등록에 실패했습니다. 다시 시도해주세요.');
+      enqueueSnackbar(err.message || '게시글 등록에 실패했습니다. 다시 시도해주세요.', { variant: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -462,7 +466,14 @@ export default function LoungePage() {
             <div className="original-post-preview">
               <div className="preview-author">
                 <div className="avatar">
-                  <User size={14} />
+                  <AppImage 
+                    src={selectedPost.author.profileImg} 
+                    alt={selectedPost.author.name} 
+                    width={24} 
+                    height={24} 
+                    style={{ borderRadius: '50%', objectFit: 'cover' }}
+                    fallback={<User size={14} />}
+                  />
                 </div>
                 <span className="name">{selectedPost.author.name}</span>
                 <span className="center">
@@ -480,7 +491,14 @@ export default function LoungePage() {
               {comments.map(comment => (
                 <div key={comment.commentId} className="comment-item">
                   <div className="comment-avatar">
-                    <User size={16} />
+                    <AppImage 
+                      src={comment.author.profileImg} 
+                      alt={comment.author.name} 
+                      width={32} 
+                      height={32} 
+                      style={{ borderRadius: '50%', objectFit: 'cover' }}
+                      fallback={<User size={16} />}
+                    />
                   </div>
                   <div className="comment-content-wrap">
                     <div className="comment-meta">

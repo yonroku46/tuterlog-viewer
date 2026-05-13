@@ -141,6 +141,18 @@
 
         &.verification-group {
           animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+          input {
+            letter-spacing: 0.5em;
+            text-align: center;
+            font-weight: bold;
+
+            &::placeholder {
+              letter-spacing: normal;
+              font-size: 0.85rem;
+              font-weight: 400;
+            }
+          }
           
           .timer {
             font-size: 0.75rem;
@@ -150,10 +162,14 @@
             display: flex;
             align-items: center;
             gap: 0.25rem;
+            transition: all 0.3s ease;
+
+            &.expired {
+              color: #ff0000;
+            }
 
             &::before {
-              content: '⏱';
-              font-size: 0.85rem;
+              font-size: 0.875rem;
             }
           }
         }
@@ -162,13 +178,6 @@
       @keyframes slideDown {
         from { opacity: 0; transform: translateY(-15px); }
         to { opacity: 1; transform: translateY(0); }
-      }
-
-      .error-message {
-        color: #ff4d4d;
-        font-size: 0.875rem;
-        text-align: center;
-        margin-top: -0.5rem;
       }
 
       .register-button {

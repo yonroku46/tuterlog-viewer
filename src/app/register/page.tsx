@@ -5,17 +5,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import AuthService from '@/api/service/AuthService';
+import { useSnackbar } from 'notistack';
 import './Register.scss';
 
 export default function RegisterPage() {
   const { register } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   // Verification states
@@ -45,9 +46,9 @@ export default function RegisterPage() {
       await AuthService.sendVerificationCode(formData.email);
       setShowVerificationInput(true);
       setTimer(180);
-      alert('인증번호가 전송되었습니다.');
-    } catch (err) {
-      setError('인증번호 전송에 실패했습니다.');
+      enqueueSnackbar('인증번호가 전송되었습니다.', { variant: 'success' });
+    } catch (err: any) {
+      enqueueSnackbar(err.message || '인증번호 전송에 실패했습니다.', { variant: 'error' });
     } finally {
       setIsVerifying(false);
     }
@@ -55,16 +56,20 @@ export default function RegisterPage() {
 
   const handleConfirmVerification = async () => {
     if (verificationCode.length !== 6) return;
+    if (timer <= 0) {
+      enqueueSnackbar('인증 시간이 만료되었습니다. 인증번호를 다시 받아주세요.', { variant: 'warning' });
+      return;
+    }
     try {
       const res = await AuthService.verifyCode(formData.email, verificationCode);
       if (res?.success) {
         setIsEmailVerified(true);
-        alert('이메일 인증이 완료되었습니다.');
+        enqueueSnackbar('이메일 인증이 완료되었습니다.', { variant: 'success' });
       } else {
-        setError('인증번호가 일치하지 않습니다.');
+        enqueueSnackbar('인증번호가 일치하지 않습니다.', { variant: 'error' });
       }
-    } catch (err) {
-      setError('인증 확인 중 오류가 발생했습니다.');
+    } catch (err: any) {
+      enqueueSnackbar(err.message || '인증 확인 중 오류가 발생했습니다.', { variant: 'error' });
     }
   };
 
@@ -75,20 +80,18 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
     if (!formData.email || !formData.password || !formData.name) {
-      setError('모든 필드를 입력해주세요.');
+      enqueueSnackbar('모든 필드를 입력해주세요.', { variant: 'warning' });
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('비밀번호가 일치하지 않습니다.');
+      enqueueSnackbar('비밀번호가 일치하지 않습니다.', { variant: 'warning' });
       return;
     }
 
     if (!isEmailVerified) {
-      setError('이메일 인증을 완료해주세요.');
+      enqueueSnackbar('이메일 인증을 완료해주세요.', { variant: 'warning' });
       return;
     }
 
@@ -101,12 +104,11 @@ export default function RegisterPage() {
       });
 
       if (res && res.success) {
-        alert('회원가입이 완료되었습니다. 로그인해주세요.');
+        enqueueSnackbar('회원가입이 완료되었습니다. 로그인해주세요.', { variant: 'success' });
         router.push('/login');
       }
-    } catch (err) {
-      const msg = '회원가입에 실패했습니다. 다시 시도해주세요.';
-      setError(msg);
+    } catch (err: any) {
+      enqueueSnackbar(err.message || '회원가입에 실패했습니다. 다시 시도해주세요.', { variant: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -164,21 +166,28 @@ export default function RegisterPage() {
                   id="verificationCode"
                   name="verificationCode"
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="6자리 번호 입력"
                   value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    setVerificationCode(value);
+                  }}
                   maxLength={6}
                 />
                 <button 
                   type="button" 
                   className="verify-confirm-btn"
                   onClick={handleConfirmVerification}
-                  disabled={verificationCode.length !== 6}
+                  disabled={verificationCode.length !== 6 || timer <= 0}
                 >
                   확인
                 </button>
               </div>
-              <p className="timer">남은 시간: {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}</p>
+              <p className={`timer ${timer === 0 ? 'expired' : ''}`}>
+                {timer === 0 ? '인증 시간이 만료되었습니다' : `남은 시간: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')}`}
+              </p>
             </div>
           )}
 
@@ -210,8 +219,6 @@ export default function RegisterPage() {
           <button type="submit" className="register-button" disabled={isLoading}>
             {isLoading ? '가입 중...' : '회원가입'}
           </button>
-
-          {error && <p className="error-message">{error}</p>}
         </form>
 
         <div className="register-footer">

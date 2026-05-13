@@ -318,6 +318,28 @@
           }
         }
       }
+
+      .gender-select {
+        width: 100%;
+        border: none;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #1c1c1e;
+        outline: none;
+        padding: 0.5rem 0;
+        background: transparent;
+        font-family: inherit;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right center;
+
+        option {
+          color: #1c1c1e;
+          background: #fff;
+        }
+      }
     }
 
     .edit-avatar-section {
@@ -501,4 +523,185 @@
   text-align: center;
   font-size: 0.8125rem;
   color: #aeaeb2;
+}
+
+/* Privacy & Customer Center */
+.privacy-content {
+  padding: 0 0.25rem 2rem;
+  
+  .privacy-card {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 1.25rem;
+    border: 1px solid #f2f2f7;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.02);
+
+    .privacy-section {
+      margin-bottom: 1.75rem;
+      
+      h4 {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: #1c1c1e;
+        margin-bottom: 0.75rem;
+      }
+      
+      p {
+        font-size: 0.875rem;
+        line-height: 1.7;
+        color: #48484a;
+        white-space: pre-wrap;
+        padding-left: 0.5rem;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .last-updated {
+      font-size: 0.75rem;
+      color: #8e8e93;
+      margin-top: 2rem;
+      border-top: 1px solid #f2f2f7;
+      padding-top: 1.25rem;
+      text-align: right;
+    }
+  }
+}
+
+.customer-center-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 3rem;
+
+  .contact-email-section {
+    .email-card {
+      background: #fff;
+      padding: 1.25rem;
+      border-radius: 1.25rem;
+      border: 1px solid #f2f2f7;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .icon-circle {
+        width: 3rem;
+        height: 3rem;
+        background: #f2f2f7;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #007aff;
+        flex-shrink: 0;
+      }
+
+      .text-group {
+        flex: 1;
+        .label {
+          font-size: 0.8125rem;
+          font-weight: 600;
+          color: #8e8e93;
+          margin-bottom: 0.125rem;
+        }
+        .value {
+          font-size: 0.9375rem;
+          font-weight: 700;
+          color: #1c1c1e;
+        }
+      }
+
+      .copy-btn {
+        background: #f2f2f7;
+        color: #007aff;
+        border: none;
+        padding: 0.5rem 0.875rem;
+        border-radius: 0.625rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:active {
+          background: #e5e5ea;
+          transform: scale(0.95);
+        }
+      }
+    }
+  }
+
+  .faq-section {
+    .section-label {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: #8e8e93;
+      margin-bottom: 1rem;
+      padding-left: 0.5rem;
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .faq-item {
+        background: #fff;
+        border-radius: 1rem;
+        border: 1px solid #f2f2f7;
+        overflow: hidden;
+
+        .faq-question {
+          width: 100%;
+          padding: 1.125rem 1.25rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: none;
+          border: none;
+          cursor: pointer;
+          text-align: left;
+
+          span {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #1c1c1e;
+            padding-right: 1rem;
+          }
+
+          svg {
+            color: #c7c7cc;
+            flex-shrink: 0;
+          }
+        }
+
+        .faq-answer {
+          padding: 0 1.25rem 1.25rem;
+          font-size: 0.875rem;
+          line-height: 1.6;
+          color: #636366;
+        }
+      }
+    }
+  }
+
+  .operating-hours {
+    background: #f2f2f7;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    
+    h5 {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: #1c1c1e;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.75rem;
+      color: #8e8e93;
+      line-height: 1.5;
+    }
+  }
 }
