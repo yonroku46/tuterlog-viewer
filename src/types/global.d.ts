@@ -91,10 +91,11 @@ declare global {
     images: string[];
     likes: number;
     liked?: boolean;
-    comments: CenterPostComment[];
+    comments: CenterPostComment[]
     createTime: string;
   }
-  interface CenterPostRes extends CenterPost{
+  interface CenterPostRes extends CenterPost {
+    commentCount: number;
     author: UserProfile;
   }
   interface CenterPostComment {

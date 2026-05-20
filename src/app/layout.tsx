@@ -4,6 +4,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import Header from "@/components/layout/Header";
 import ScrollToTop from "@/components/layout/ScrollToTop";
 import { AuthProvider } from '@/providers/AuthProvider';
+import { NotificationProvider } from '@/providers/NotificationProvider';
 import SnackbarProvider from '@/providers/SnackbarProvider';
 import "@/styles/globals.scss";
 
@@ -28,16 +29,18 @@ export default function RootLayout({
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <AuthProvider>
-          <SnackbarProvider>
-          <ScrollToTop />
-          <main>
-            <div className="content-area">
-              <Header />
-              {children}
-            </div>
-            <BottomNav />
-          </main>
-          </SnackbarProvider>
+          <NotificationProvider>
+            <SnackbarProvider>
+              <ScrollToTop />
+              <main>
+                <div className="content-area">
+                  <Header />
+                  {children}
+                </div>
+                <BottomNav />
+              </main>
+            </SnackbarProvider>
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

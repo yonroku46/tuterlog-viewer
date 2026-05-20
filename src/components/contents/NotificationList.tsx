@@ -1,51 +1,18 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Bell, User } from 'lucide-react';
 import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import LoadingSpinner from './LoadingSpinner';
+import EmptyState from './EmptyState';
+import { useNotification } from '@/providers/NotificationProvider';
 import './NotificationList.scss';
 
 dayjs.locale('ko');
 
 const NotificationList = () => {
-  const [notifications, setNotifications] = useState<AppNotification[]>([
-    {
-      appNotificationId: '3',
-      title: '수업 미리 알림',
-      message: '[2026.04.03 (금) 09:00] [체어 | 리포머] 수업이 예정되어 있습니다.',
-      isRead: false,
-      iconType: 'AVATAR',
-      createTime: '2026-04-03 09:12',
-    },
-    {
-      appNotificationId: '1',
-      title: '잔여횟수 미리 알림',
-      message: '[마토바 미쿠]님! [그룹 레슨/50회]의 잔여횟수가 3 회 남았습니다.',
-      centerName: '엠씨기구필라테스 김해점',
-      isRead: true,
-      iconType: 'LOGO',
-      createTime: '2026-05-11 14:30',
-    },
-    {
-      appNotificationId: '2',
-      title: '잔여일 미리 알림',
-      message: '[마토바 미쿠]님! [그룹 레슨/50회]의 잔여일이 3 일 남았습니다.',
-      centerName: '엠씨기구필라테스 김해점',
-      isRead: true,
-      iconType: 'LOGO',
-      createTime: '2026-04-04 11:05',
-    }
-  ]);
-
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-  };
-
-  const markAsRead = (id: string) => {
-    setNotifications(prev => prev.map(n => 
-      n.appNotificationId === id ? { ...n, isRead: true } : n
-    ));
-  };
+  const { notifications, isLoading, markAsRead, markAllAsRead } = useNotification();
 
   // Group and sort notifications
   const sortedGroupedNotifications = useMemo(() => {
@@ -88,46 +55,54 @@ const NotificationList = () => {
     return targetDate.format('M월 D일');
   };
 
+  if (isLoading) return <LoadingSpinner />;
+
   return (
     <div className="notification-list">
-      <div className="list-header">
-        <button className="mark-all-read" onClick={markAllAsRead}>모두 읽음으로 표시</button>
-      </div>
-
-      {sortedGroupedNotifications.map(([date, items]) => (
-        <div key={date} className="date-group">
-          <h3 className="group-date">{getDisplayDate(date)}</h3>
-          <div className="notification-items">
-            {items.map((item) => (
-              <div 
-                key={item.appNotificationId} 
-                className={`notification-item ${!item.isRead ? 'unread' : ''}`}
-                onClick={() => markAsRead(item.appNotificationId)}
-              >
-                <div className="icon-area">
-                  {item.iconType === 'LOGO' ? (
-                    <Bell className="logo-icon" />
-                  ) : (
-                    <div className="default-avatar">
-                      <User size={24} />
-                    </div>
-                  )}
-                </div>
-                <div className="content-area">
-                  <div className="header-row">
-                    <div className="title-group">
-                      <span className="item-title">{item.title}</span>
-                      <span className="item-time">{dayjs(item.createTime).format('a h:mm')}</span>
-                    </div>
-                  </div>
-                  <p className="item-message">{item.message}</p>
-                  {item.centerName && <span className="item-footer">{item.centerName}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
+      {notifications.length > 0 && (
+        <div className="list-header">
+          <button className="mark-all-read" onClick={markAllAsRead}>모두 읽음으로 표시</button>
         </div>
-      ))}
+      )}
+
+      {notifications.length === 0 ? (
+        <EmptyState icon={Bell} message="수신된 알림이 없습니다." />
+      ) : (
+        sortedGroupedNotifications.map(([date, items]) => (
+          <div key={date} className="date-group">
+            <h3 className="group-date">{getDisplayDate(date)}</h3>
+            <div className="notification-items">
+              {items.map((item) => (
+                <div 
+                  key={item.appNotificationId} 
+                  className={`notification-item ${!item.isRead ? 'unread' : ''}`}
+                  onClick={() => markAsRead(item.appNotificationId)}
+                >
+                  <div className="icon-area">
+                    {item.iconType === 'LOGO' ? (
+                      <Bell className="logo-icon" />
+                    ) : (
+                      <div className="default-avatar">
+                        <User size={24} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="content-area">
+                    <div className="header-row">
+                      <div className="title-group">
+                        <span className="item-title">{item.title}</span>
+                        <span className="item-time">{dayjs(item.createTime).format('A h:mm')}</span>
+                      </div>
+                    </div>
+                    <p className="item-message">{item.message}</p>
+                    {item.centerName && <span className="item-footer">{item.centerName}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 };

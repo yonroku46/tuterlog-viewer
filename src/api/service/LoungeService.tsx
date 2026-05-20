@@ -17,6 +17,14 @@ export interface CreatePostParams {
   imageFiles?: File[];
 }
 
+export interface UpdatePostParams {
+  postId: string;
+  centerId: string;
+  content: string;
+  existingImages: string[];
+  imageFiles?: File[];
+}
+
 export interface CreateCommentParams {
   postId: string;
   content: string;
@@ -98,6 +106,41 @@ class LoungeService {
   }
 
   /**
+   * 게시글 수정 (이미지 포함 multipart)
+   * PUT /lounge/post
+   */
+  async updatePost(params: UpdatePostParams): Promise<ActionRes | undefined> {
+    try {
+      const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+      const form = new FormData();
+      form.append(
+        'req',
+        new Blob(
+          [
+            JSON.stringify({
+              postId: params.postId,
+              centerId: params.centerId,
+              content: params.content,
+              existingImages: JSON.stringify(params.existingImages),
+            }),
+          ],
+          { type: 'application/json' }
+        )
+      );
+      if (params.imageFiles && params.imageFiles.length > 0) {
+        params.imageFiles.forEach((file) => form.append('imageFiles', file));
+      }
+      const response: ApiResponse = await ApiInstance.put(ApiRoutes.LOUNGE_POST, form, config);
+      if (response && !response.hasErrors) {
+        return response.responseData as ActionRes;
+      }
+    } catch (error) {
+      console.error('[LoungeService] updatePost', error);
+      throw error;
+    }
+  }
+
+  /**
    * 게시글 삭제
    * DELETE /lounge/post?postId=
    */
@@ -120,8 +163,12 @@ class LoungeService {
    */
   async toggleLike(postId: string, liked: boolean): Promise<ActionRes | undefined> {
     try {
-      const method = liked ? 'delete' : 'post';
-      const response: ApiResponse = await ApiInstance[method](ApiRoutes.LOUNGE_POST_LIKE, { postId });
+      let response: ApiResponse;
+      if (liked) {
+        response = await ApiInstance.delete(ApiRoutes.LOUNGE_POST_LIKE, { data: { postId } });
+      } else {
+        response = await ApiInstance.post(ApiRoutes.LOUNGE_POST_LIKE, { postId });
+      }
       if (response && !response.hasErrors) {
         return response.responseData as ActionRes;
       }

@@ -27,6 +27,13 @@ const PROFILE_PRODUCTS = `${PROFILE_ROOT}/products`;
 const PROFILE_HISTORY = `${PROFILE_ROOT}/history`;
 const PROFILE_NOTIFICATION = `${PROFILE_ROOT}/notification-settings`;
 
+// notification
+const NOTIFICATION_ROOT = `${ROOT}/notification`;
+const NOTIFICATION_LIST = `${NOTIFICATION_ROOT}/list`;
+const NOTIFICATION_READ = `${NOTIFICATION_ROOT}/read`;
+const NOTIFICATION_READ_ALL = `${NOTIFICATION_ROOT}/read-all`;
+const NOTIFICATION_SUBSCRIBE = `${NOTIFICATION_ROOT}/subscribe`;
+
 // auth
 const AUTH_ROOT = `${ROOT}/auth`;
 const AUTH_LOGIN = `${AUTH_ROOT}/login`;
@@ -60,6 +67,10 @@ const ApiRoutes = {
   PROFILE_PRODUCTS,
   PROFILE_HISTORY,
   PROFILE_NOTIFICATION,
+  NOTIFICATION_LIST,
+  NOTIFICATION_READ,
+  NOTIFICATION_READ_ALL,
+  NOTIFICATION_SUBSCRIBE,
 };
 
 export default ApiRoutes;

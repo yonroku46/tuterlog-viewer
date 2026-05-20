@@ -5,12 +5,15 @@ import { usePathname } from 'next/navigation';
 import { Bell } from 'lucide-react';
 import SlideDialog from '@/components/dialog/SlideDialog';
 import NotificationList from '@/components/contents/NotificationList';
+import SseStatus from '@/components/contents/SseStatus';
 import { useAuth } from '@/providers/AuthProvider';
+import { useNotification } from '@/providers/NotificationProvider';
 import './Header.scss';
 
 const Header = () => {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { unreadCount } = useNotification();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const [selectedCenter, setSelectedCenter] = useState('전체 센터');
@@ -52,7 +55,7 @@ const Header = () => {
         <div className="header-actions">
           <button className="action-btn" onClick={() => setIsNotificationOpen(true)}>
             <Bell size={22} />
-            <span className="unread-dot" />
+            {unreadCount > 0 && <span className="unread-dot" />}
           </button>
         </div>
       </header>
@@ -61,6 +64,7 @@ const Header = () => {
         isOpen={isNotificationOpen}
         onClose={() => setIsNotificationOpen(false)}
         title="알림"
+        rightElement={<SseStatus />}
         noPadding
       >
         <NotificationList />

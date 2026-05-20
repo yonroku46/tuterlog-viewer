@@ -2,8 +2,9 @@
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Heart, MessageCircle, MoreHorizontal, User, Search, MapPin, AlertCircle, Send, Image as ImageIcon, Flag, Eye, PenSquare, ChevronDown, X, Loader2 } from 'lucide-react';
+import { Heart, MessageCircle, MoreHorizontal, User, Search, MapPin, AlertCircle, Send, Image as ImageIcon, Flag, Eye, PenSquare, ChevronDown, X, Loader2, Trash2 } from 'lucide-react';
 import { useSnackbar } from 'notistack';
+import { useAuth } from '@/providers/AuthProvider';
 import SlideDialog from '@/components/dialog/SlideDialog';
 import AppImage from '@/components/contents/AppImage';
 import LoadingSpinner from '@/components/contents/LoadingSpinner';
@@ -40,15 +41,21 @@ const SafeImage = ({ src, alt }: { src: string; alt: string }) => {
 const LoungePost = ({
   post,
   isReported,
+  currentUser,
   onOpenComments,
   onReport,
   onLike,
+  onEdit,
+  onDelete,
 }: {
   post: CenterPostRes;
   isReported: boolean;
+  currentUser: any;
   onOpenComments: (post: CenterPostRes) => void;
   onReport: (id: string) => void;
   onLike: (post: CenterPostRes) => void;
+  onEdit: (post: CenterPostRes) => void;
+  onDelete: (id: string) => void;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [revealReported, setRevealReported] = useState(false);
@@ -73,6 +80,20 @@ const LoungePost = ({
     }
   };
 
+  const handleEdit = () => {
+    onEdit(post);
+    setIsMenuOpen(false);
+  };
+
+  const handleDelete = () => {
+    if (confirm('이 게시글을 정말 삭제하시겠습니까?')) {
+      onDelete(post.postId);
+      setIsMenuOpen(false);
+    }
+  };
+
+  const isMyPost = post.author?.userId === currentUser?.userId;
+
   return (
     <article className={`lounge-post ${isReported && !revealReported ? 'is-reported' : ''}`}>
       {isReported && !revealReported && (
@@ -89,11 +110,11 @@ const LoungePost = ({
       <div className="post-header">
         <div className="author-info">
           <div className="author-avatar">
-            <AppImage 
-              src={post.author.profileImg} 
-              alt={post.author.name} 
-              width={32} 
-              height={32} 
+            <AppImage
+              src={post.author.profileImg}
+              alt={post.author.name}
+              width={32}
+              height={32}
               style={{ borderRadius: '50%', objectFit: 'cover' }}
               fallback={<User size={20} />}
             />
@@ -115,14 +136,28 @@ const LoungePost = ({
           </button>
           {isMenuOpen && (
             <div className="menu-dropdown">
-              <button
-                onClick={handleReport}
-                disabled={isReported}
-                style={isReported ? { opacity: 0.5, cursor: 'default', color: '#8e8e93' } : {}}
-              >
-                <Flag size={14} />
-                {isReported ? '이미 신고됨' : '게시글 신고하기'}
-              </button>
+              {isMyPost ? (
+                <>
+                  <button onClick={handleEdit}>
+                    <PenSquare size={14} className="text-gray-700" />
+                    수정하기
+                  </button>
+                  <button onClick={handleDelete} className="delete-btn">
+                    <Trash2 size={14} />
+                    삭제하기
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="report-btn"
+                  onClick={handleReport}
+                  disabled={isReported}
+                  style={isReported ? { opacity: 0.5, cursor: 'default', color: '#8e8e93' } : {}}
+                >
+                  <Flag size={14} />
+                  {isReported ? '이미 신고됨' : '게시글 신고하기'}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -130,7 +165,7 @@ const LoungePost = ({
 
       <div className="post-content">
         <p>{post.content}</p>
-        {post.images.length > 0 && (
+        {post.images?.length > 0 && (
           <div className="post-images">
             {post.images.map((img, idx) => (
               <SafeImage key={idx} src={img} alt="post content" />
@@ -146,7 +181,7 @@ const LoungePost = ({
         </button>
         <button className="action-btn" onClick={() => onOpenComments(post)}>
           <MessageCircle size={20} />
-          <span>{post.comments.length}</span>
+          <span>{post.commentCount || 0}</span>
         </button>
       </div>
     </article>
@@ -154,6 +189,7 @@ const LoungePost = ({
 };
 
 export default function LoungePage() {
+  const { user } = useAuth();
   const [posts, setPosts] = useState<CenterPostRes[]>([]);
   const [centers, setCenters] = useState<Center[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -173,10 +209,11 @@ export default function LoungePage() {
   const [isSendingComment, setIsSendingComment] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
+  const [editingPost, setEditingPost] = useState<CenterPostRes | null>(null);
   const [isWriteDialogOpen, setIsWriteDialogOpen] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostCenterId, setNewPostCenterId] = useState('');
-  const [newPostImages, setNewPostImages] = useState<{ file: File; preview: string }[]>([]);
+  const [newPostImages, setNewPostImages] = useState<{ file?: File; preview: string; isExisting?: boolean; url?: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -330,28 +367,89 @@ export default function LoungePage() {
 
   const resetWriteDialog = () => {
     setIsWriteDialogOpen(false);
+    setEditingPost(null);
     setNewPostContent('');
-    newPostImages.forEach(img => URL.revokeObjectURL(img.preview));
+    newPostImages.forEach(img => {
+      if (!img.isExisting && img.preview) {
+        try {
+          URL.revokeObjectURL(img.preview);
+        } catch { /* ignore */ }
+      }
+    });
     setNewPostImages([]);
+  };
+
+  const handleEditPost = (post: CenterPostRes) => {
+    setEditingPost(post);
+    setNewPostContent(post.content);
+    setNewPostCenterId(post.centerId);
+    const existing = (post.images || []).map(url => ({
+      preview: url,
+      isExisting: true,
+      url: url
+    }));
+    setNewPostImages(existing);
+    setIsWriteDialogOpen(true);
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      const res = await LoungeService.deletePost(postId);
+      if (res?.success !== false) {
+        enqueueSnackbar('게시글이 삭제되었습니다.', { variant: 'success' });
+        await fetchPosts(selectedCenter, searchQuery);
+      }
+    } catch (err: any) {
+      console.error('게시글 삭제 실패', err);
+      enqueueSnackbar(err.message || '게시글 삭제에 실패했습니다.', { variant: 'error' });
+    }
   };
 
   const handleSubmitPost = async () => {
     if (!newPostContent.trim() || isSubmitting) return;
     setIsSubmitting(true);
     try {
-      const res = await LoungeService.createPost({
-        centerId: newPostCenterId,
-        content: newPostContent.trim(),
-        imageFiles: newPostImages.map(i => i.file),
-      });
-      if (res?.success !== false) {
-        enqueueSnackbar('게시글이 등록되었습니다.', { variant: 'success' });
-        resetWriteDialog();
-        await fetchPosts(selectedCenter, searchQuery);
+      if (editingPost) {
+        const existingImages = newPostImages
+          .filter(img => img.isExisting)
+          .map(img => img.url || '');
+        const newImageFiles = newPostImages
+          .filter(img => !img.isExisting && img.file)
+          .map(img => img.file as File);
+
+        const res = await LoungeService.updatePost({
+          postId: editingPost.postId,
+          centerId: newPostCenterId,
+          content: newPostContent.trim(),
+          existingImages,
+          imageFiles: newImageFiles,
+        });
+
+        if (res?.success !== false) {
+          enqueueSnackbar('게시글이 수정되었습니다.', { variant: 'success' });
+          resetWriteDialog();
+          await fetchPosts(selectedCenter, searchQuery);
+        }
+      } else {
+        const newImageFiles = newPostImages
+          .filter(img => img.file)
+          .map(img => img.file as File);
+
+        const res = await LoungeService.createPost({
+          centerId: newPostCenterId,
+          content: newPostContent.trim(),
+          imageFiles: newImageFiles,
+        });
+
+        if (res?.success !== false) {
+          enqueueSnackbar('게시글이 등록되었습니다.', { variant: 'success' });
+          resetWriteDialog();
+          await fetchPosts(selectedCenter, searchQuery);
+        }
       }
     } catch (err: any) {
-      console.error('게시글 작성 실패', err);
-      enqueueSnackbar(err.message || '게시글 등록에 실패했습니다. 다시 시도해주세요.', { variant: 'error' });
+      console.error('게시글 저장 실패', err);
+      enqueueSnackbar(err.message || '게시글 저장에 실패했습니다. 다시 시도해주세요.', { variant: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -362,14 +460,19 @@ export default function LoungePage() {
     if (!files) return;
     const remainingSlots = 5 - newPostImages.length;
     const selected = Array.from(files).slice(0, remainingSlots);
-    const newImgs = selected.map(file => ({ file, preview: URL.createObjectURL(file) }));
+    const newImgs = selected.map(file => ({ file, preview: URL.createObjectURL(file), isExisting: false }));
     setNewPostImages(prev => [...prev, ...newImgs]);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleRemoveImage = (index: number) => {
     setNewPostImages(prev => {
-      URL.revokeObjectURL(prev[index].preview);
+      const img = prev[index];
+      if (!img.isExisting && img.preview) {
+        try {
+          URL.revokeObjectURL(img.preview);
+        } catch { /* ignore */ }
+      }
       return prev.filter((_, i) => i !== index);
     });
   };
@@ -422,9 +525,12 @@ export default function LoungePage() {
               key={post.postId}
               post={post}
               isReported={reportedIds.includes(post.postId)}
+              currentUser={user}
               onOpenComments={handleOpenComments}
               onReport={handleReportPost}
               onLike={handleLike}
+              onEdit={handleEditPost}
+              onDelete={handleDeletePost}
             />
           ))
         ) : (
@@ -439,7 +545,7 @@ export default function LoungePage() {
           setSelectedPost(null);
           setComments([]);
         }}
-        title={selectedPost ? `${selectedPost.author}님의 글에 댓글` : '댓글'}
+        title={selectedPost ? `${selectedPost.author.name}님의 글에 댓글` : '댓글'}
         noPadding
         footer={
           <div className="comment-input-area">
@@ -520,7 +626,7 @@ export default function LoungePage() {
         noPadding
         isOpen={isWriteDialogOpen}
         onClose={handleCloseWriteDialog}
-        title="새 글 작성"
+        title={editingPost ? '게시글 수정' : '새 글 작성'}
         footer={
           <div className="write-dialog-footer">
             <button
@@ -531,10 +637,10 @@ export default function LoungePage() {
               {isSubmitting ? (
                 <>
                   <Loader2 size={16} className="spin" />
-                  등록 중...
+                  {editingPost ? '수정 중...' : '등록 중...'}
                 </>
               ) : (
-                '등록하기'
+                editingPost ? '수정하기' : '등록하기'
               )}
             </button>
           </div>

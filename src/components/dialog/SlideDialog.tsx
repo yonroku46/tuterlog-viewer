@@ -8,10 +8,11 @@ interface SlideDialogProps {
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  rightElement?: React.ReactNode;
   noPadding?: boolean;
 }
 
-const SlideDialog: React.FC<SlideDialogProps> = ({ isOpen, onClose, title, children, footer, noPadding }) => {
+const SlideDialog: React.FC<SlideDialogProps> = ({ isOpen, onClose, title, children, footer, rightElement, noPadding }) => {
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [active, setActive] = useState(false);
 
@@ -54,7 +55,9 @@ const SlideDialog: React.FC<SlideDialogProps> = ({ isOpen, onClose, title, child
             <ArrowLeft size={24} />
           </button>
           <h2 className="dialog-title">{title}</h2>
-          <div className="header-placeholder" />
+          <div className="header-right">
+            {rightElement}
+          </div>
         </header>
         <div className={`dialog-body ${noPadding ? 'no-padding' : ''}`}>
           {children}

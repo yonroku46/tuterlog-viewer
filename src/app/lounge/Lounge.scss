@@ -282,14 +282,22 @@
             display: flex;
             align-items: center;
             gap: 0.625rem;
-            color: #ff3b30;
+            color: #1c1c1e;
             font-size: 0.875rem;
             font-weight: 600;
             cursor: pointer;
             text-align: left;
 
             &:active { 
-              background: #fff2f2; 
+              background: #f2f2f7; 
+            }
+
+            &.delete-btn, &.report-btn {
+              color: #ff3b30;
+
+              &:active { 
+                background: #fff2f2; 
+              }
             }
           }
         }
