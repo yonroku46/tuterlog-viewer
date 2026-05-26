@@ -10,6 +10,7 @@ import AppImage from '@/components/contents/AppImage';
 import LoadingSpinner from '@/components/contents/LoadingSpinner';
 import EmptyState from '@/components/contents/EmptyState';
 import LoungeService from '@/api/service/LoungeService';
+import HomeService from '@/api/service/HomeService';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
@@ -165,9 +166,9 @@ const LoungePost = ({
 
       <div className="post-content">
         <p>{post.content}</p>
-        {post.images?.length > 0 && (
+        {post.imageList && post.imageList.length > 0 && (
           <div className="post-images">
-            {post.images.map((img, idx) => (
+            {post.imageList.map((img, idx) => (
               <SafeImage key={idx} src={img} alt="post content" />
             ))}
           </div>
@@ -230,7 +231,7 @@ export default function LoungePage() {
       setIsLoading(true);
       try {
         const [centerRes, postRes] = await Promise.all([
-          LoungeService.getCenterList(),
+          HomeService.getMyCenters(),
           LoungeService.getPostList(),
         ]);
 
@@ -383,7 +384,7 @@ export default function LoungePage() {
     setEditingPost(post);
     setNewPostContent(post.content);
     setNewPostCenterId(post.centerId);
-    const existing = (post.images || []).map(url => ({
+    const existing = (post.imageList || []).map(url => ({
       preview: url,
       isExisting: true,
       url: url
@@ -572,11 +573,11 @@ export default function LoungePage() {
             <div className="original-post-preview">
               <div className="preview-author">
                 <div className="avatar">
-                  <AppImage 
-                    src={selectedPost.author.profileImg} 
-                    alt={selectedPost.author.name} 
-                    width={24} 
-                    height={24} 
+                  <AppImage
+                    src={selectedPost.author.profileImg}
+                    alt={selectedPost.author.name}
+                    width={24}
+                    height={24}
                     style={{ borderRadius: '50%', objectFit: 'cover' }}
                     fallback={<User size={14} />}
                   />
@@ -597,11 +598,11 @@ export default function LoungePage() {
               {comments.map(comment => (
                 <div key={comment.commentId} className="comment-item">
                   <div className="comment-avatar">
-                    <AppImage 
-                      src={comment.author.profileImg} 
-                      alt={comment.author.name} 
-                      width={32} 
-                      height={32} 
+                    <AppImage
+                      src={comment.author.profileImg}
+                      alt={comment.author.name}
+                      width={32}
+                      height={32}
                       style={{ borderRadius: '50%', objectFit: 'cover' }}
                       fallback={<User size={16} />}
                     />

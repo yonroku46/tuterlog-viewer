@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useMemo, useEffect } from 'react';
-import { User, ChevronDown, Check, MapPin, AlertCircle, Trash2, MoreVertical, CalendarDays, Trophy, Activity } from 'lucide-react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
+import { User, ChevronDown, Check, MapPin, AlertCircle, Trash2, MoreVertical, CalendarDays } from 'lucide-react';
 import { useSnackbar } from 'notistack';
+import HomeService from '@/api/service/HomeService';
 import SlideDialog from '@/components/dialog/SlideDialog';
 import AppImage from '@/components/contents/AppImage';
 import dayjs from 'dayjs';
@@ -11,60 +12,24 @@ import './Home.scss';
 
 dayjs.locale('ko');
 
-const CENTERS = ['필라테스 강남점', '요가 서초점', '피트니스 광교점'];
-
-const TICKETS: Ticket[] = [
-  {
-    ticketId: '1',
-    ticketType: 'GROUP',
-    title: '6:1 그룹 회원권',
-    subTitle: '6:1 · 횟수제 · 주3회 · 당일변경 1회',
-    centerName: '필라테스 강남점',
-    startDate: '2026-05-20',
-    endDate: '2027-07-01',
-    stats: { available: 29, cancelable: 30, remaining: '30 / 30' },
-    createTime: '2024-03-14'
-  },
-  {
-    ticketId: '2',
-    ticketType: 'PT',
-    title: '1:1 개인 PT 10회권',
-    subTitle: '1:1 · 개인레슨 · 상시가능',
-    centerName: '필라테스 강남점',
-    startDate: '2026-05-20',
-    endDate: '2026-07-21',
-    stats: { available: 8, cancelable: 10, remaining: '8 / 10' },
-    createTime: '2024-04-01'
-  }
-];
-
-const USER_RESERVATIONS: Reservation[] = [
-  { reservationId: '1', centerId: '0', userId: '0', classId: '1', reservationDate: '2026-05-11', startTime: '09:00', endTime: '09:50', className: '6:1 리포머&캐딜락', instructor: { instructorId: '1', name: '이유나 강사', centerId: '0', profileImg: '', role: '', createTime: '' }, room: '리포머 룸', status: 'CONFIRMED', reservedCount: 5, capacity: 6, createTime: '2026-05-11 12:00' },
-  { reservationId: '2', centerId: '0', userId: '0', classId: '2', reservationDate: '2026-05-16', startTime: '14:00', endTime: '14:50', className: '6:1 체어 & 바렐', instructor: { instructorId: '2', name: '박소윤 강사', centerId: '0', profileImg: '', role: '', createTime: '' }, room: '체어 룸', status: 'CONFIRMED', reservedCount: 6, capacity: 6, createTime: '2026-05-16 12:00' },
-  { reservationId: '3', centerId: '1', userId: '0', classId: '3', reservationDate: '2026-05-15', startTime: '19:00', endTime: '19:50', className: '빈야사 요가 A', instructor: { instructorId: '3', name: '김하늘 강사', centerId: '1', profileImg: '', role: '', createTime: '' }, room: 'Studio 2', status: 'CANCELLED', reservedCount: 15, capacity: 15, createTime: '2026-05-15 12:00' },
-  { reservationId: '4', centerId: '0', userId: '0', classId: '4', reservationDate: '2026-05-20', startTime: '11:00', endTime: '11:50', className: '6:1 스프링보드', instructor: { instructorId: '1', name: '이유나 강사', centerId: '0', profileImg: '', role: '', createTime: '' }, room: 'Reformer 2', status: 'CONFIRMED', reservedCount: 4, capacity: 6, createTime: '2026-05-20 12:00' },
-];
-
-const ReservedCard = ({ 
-  reservation, 
-  showCancel = true, 
-  onCancel 
-}: { 
-  reservation: Reservation; 
+const ReservedCard = ({
+  reservation,
+  showCancel = true,
+  onCancel,
+}: {
+  reservation: ReservationRes;
   showCancel?: boolean;
-  onCancel?: (res: Reservation) => void;
+  onCancel?: (res: ReservationRes) => void;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // 메뉴 바깥 클릭 시 닫기 로직
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
     };
-
     if (isMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
@@ -73,8 +38,10 @@ const ReservedCard = ({
     };
   }, [isMenuOpen]);
 
+  const isCancelled = reservation.status === 'CANCELLED';
+
   return (
-    <div className="reserved-card">
+    <div className={`reserved-card ${isCancelled ? 'cancelled' : ''}`}>
       <div className="class-date">
         <div className="date-left">
           <span className="date-text">
@@ -84,18 +51,20 @@ const ReservedCard = ({
             {reservation.status === 'CONFIRMED' ? '예약확정' : reservation.status === 'CANCELLED' ? '취소' : '대기중'}
           </span>
         </div>
-        
-        {showCancel && (
+
+        {showCancel && !isCancelled && (
           <div className="more-menu-container" ref={menuRef}>
             <button className="more-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               <MoreVertical size={18} />
             </button>
             {isMenuOpen && (
               <div className="menu-dropdown">
-                <button onClick={() => {
-                  onCancel?.(reservation);
-                  setIsMenuOpen(false);
-                }}>
+                <button
+                  onClick={() => {
+                    onCancel?.(reservation);
+                    setIsMenuOpen(false);
+                  }}
+                >
                   <Trash2 size={14} />
                   예약 취소하기
                 </button>
@@ -106,11 +75,11 @@ const ReservedCard = ({
       </div>
       <div className="class-info">
         <div className="instructor-img">
-          <AppImage 
-            src={reservation.instructor?.profileImg} 
-            alt={reservation.instructor?.name} 
-            width={40} 
-            height={40} 
+          <AppImage
+            src={reservation.instructorProfileImg}
+            alt={reservation.instructorName}
+            width={40}
+            height={40}
             style={{ borderRadius: '50%', objectFit: 'cover' }}
             fallback={
               <div className="fallback-icon">
@@ -121,7 +90,7 @@ const ReservedCard = ({
         </div>
         <div className="details">
           <p className="title">{reservation.className}</p>
-          <p className="desc">{reservation.instructor.name} | {reservation.room}</p>
+          <p className="desc">{reservation.instructorName} | {reservation.room}</p>
           <div className="attendance-info">
             <span className="capacity-label">{reservation.capacity}명 정원</span>
             <span className="divider">·</span>
@@ -134,11 +103,17 @@ const ReservedCard = ({
 };
 
 export default function HomePage() {
-  const [selectedCenter, setSelectedCenter] = useState(CENTERS[0]);
+  const [centers, setCenters] = useState<UserCenter[]>([]);
+  const [selectedCenter, setSelectedCenter] = useState<UserCenter | null>(null);
   const [isCenterDialogOpen, setIsCenterDialogOpen] = useState(false);
   const [isAllReservationsOpen, setIsAllReservationsOpen] = useState(false);
   const [activeTicketIndex, setActiveTicketIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [reservations, setReservations] = useState<ReservationRes[]>([]);
+  const [isLoadingCenters, setIsLoadingCenters] = useState(true);
+  const [isLoadingTickets, setIsLoadingTickets] = useState(false);
+  const [isLoadingReservations, setIsLoadingReservations] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -150,27 +125,75 @@ export default function HomePage() {
   const [dateStartX, setDateStartX] = useState(0);
   const [dateScrollLeft, setDateScrollLeft] = useState(0);
 
-  // Load persisted center on mount
+  // 가입 센터 목록 불러오기
   useEffect(() => {
-    const savedCenter = localStorage.getItem('selectedCenter');
-    if (savedCenter && CENTERS.includes(savedCenter)) {
-      setSelectedCenter(savedCenter);
-    }
+    const fetchCenters = async () => {
+      setIsLoadingCenters(true);
+      try {
+        const res = await HomeService.getMyCenters();
+        const list = res?.list ?? [];
+        setCenters(list);
+
+        // localStorage에 저장된 마지막 선택 센터 복원
+        const savedCenterId = localStorage.getItem('selectedCenterId');
+        const saved = list.find(c => c.centerId === savedCenterId);
+        setSelectedCenter(saved ?? list[0] ?? null);
+      } catch (e) {
+        console.error('[HomePage] fetchCenters', e);
+      } finally {
+        setIsLoadingCenters(false);
+      }
+    };
+    fetchCenters();
   }, []);
 
-  // 현재 선택된 센터의 지점 인덱스 (Mock용)
-  const centerIndex = CENTERS.indexOf(selectedCenter);
+  // 센터 변경 시 티켓/예약 불러오기
+  useEffect(() => {
+    if (!selectedCenter) return;
 
-  // 현재 센터의 예약 내역
-  const myReservations = useMemo(() => {
-    return USER_RESERVATIONS.filter(res => res.centerId === centerIndex.toString())
-      .sort((a, b) => dayjs(a.reservationDate).unix() - dayjs(b.reservationDate).unix());
-  }, [centerIndex]);
+    const fetchData = async () => {
+      setIsLoadingTickets(true);
+      setIsLoadingReservations(true);
+      setActiveTicketIndex(0);
 
-  // 선택된 날짜의 예약 내역 (홈 화면용)
+      try {
+        const [userTicket, reservationRes] = await Promise.all([
+          HomeService.getTicketsByCenter(selectedCenter.centerId),
+          HomeService.getReservationsByCenter(selectedCenter.centerId),
+        ]);
+
+        const rawTickets = userTicket?.list ?? [];
+        setTickets(rawTickets);
+
+        const rawReservations = reservationRes?.list ?? [];
+        setReservations(rawReservations);
+      } catch (e) {
+        console.error('[HomePage] fetchData', e);
+        setTickets([]);
+        setReservations([]);
+      } finally {
+        setIsLoadingTickets(false);
+        setIsLoadingReservations(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedCenter]);
+
+  // 선택된 날짜의 예약 목록 (취소된 예약은 제외하여 홈 화면 정돈)
   const reservationsForDate = useMemo(() => {
-    return myReservations.filter(res => dayjs(res.reservationDate).isSame(selectedDate, 'day'));
-  }, [myReservations, selectedDate]);
+    return reservations
+      .filter(res => dayjs(res.reservationDate).isSame(selectedDate, 'day'))
+      .filter(res => res.status !== 'CANCELLED')
+      .sort((a, b) => dayjs(a.startTime, 'HH:mm').unix() - dayjs(b.startTime, 'HH:mm').unix());
+  }, [reservations, selectedDate]);
+
+  // 전체 예약 목록 (날짜순)
+  const allReservations = useMemo(() => {
+    return [...reservations].sort((a, b) =>
+      dayjs(a.reservationDate).unix() - dayjs(b.reservationDate).unix()
+    );
+  }, [reservations]);
 
   const dateRange = useMemo(() => {
     return Array.from({ length: 28 }).map((_, i) => {
@@ -187,23 +210,32 @@ export default function HomePage() {
     });
   }, []);
 
-  const handleCenterSelect = (center: string) => {
+  const handleCenterSelect = (center: UserCenter) => {
     setSelectedCenter(center);
-    localStorage.setItem('selectedCenter', center);
+    localStorage.setItem('selectedCenterId', center.centerId);
     setIsCenterDialogOpen(false);
   };
 
-  const handleCancel = (res: Reservation) => {
+  const handleCancel = useCallback(async (res: ReservationRes) => {
     const isToday = dayjs(res.reservationDate).isSame(dayjs(), 'day');
     if (isToday) {
       enqueueSnackbar('당일 수업은 취소가 불가능합니다.', { variant: 'warning' });
       return;
     }
 
-    if (confirm('이 예약을 취소하시겠습니까?')) {
+    if (!confirm('이 예약을 취소하시겠습니까?')) return;
+
+    try {
+      await HomeService.cancelReservation(res.reservationId);
       enqueueSnackbar('취소되었습니다.', { variant: 'success' });
+      // 상태 업데이트
+      setReservations(prev =>
+        prev.map(r => r.reservationId === res.reservationId ? { ...r, status: 'CANCELLED' } : r)
+      );
+    } catch (e) {
+      enqueueSnackbar('취소 처리 중 오류가 발생했습니다.', { variant: 'error' });
     }
-  };
+  }, [enqueueSnackbar]);
 
   const scrollToIndex = (index: number) => {
     if (carouselRef.current) {
@@ -257,11 +289,13 @@ export default function HomePage() {
 
   const onDateMouseUp = () => setIsDateDragging(false);
 
+  const currentTicket = tickets[activeTicketIndex];
+
   return (
     <div className="home-page">
       <header className="home-header">
         <div className="center-selector" onClick={() => setIsCenterDialogOpen(true)}>
-          <h1>{selectedCenter}</h1>
+          <h1>{isLoadingCenters ? '불러오는 중...' : (selectedCenter?.name ?? '소속센터 없음')}</h1>
           <ChevronDown size={20} strokeWidth={2.5} />
         </div>
       </header>
@@ -272,86 +306,94 @@ export default function HomePage() {
         title="시설 선택"
       >
         <div className="center-select-list">
-          {CENTERS.map((center) => (
-            <button
-              key={center}
-              className={`center-select-item ${selectedCenter === center ? 'active' : ''}`}
-              onClick={() => handleCenterSelect(center)}
-            >
-              <span className="name">{center}</span>
-              {selectedCenter === center && <Check size={20} className="check-icon" />}
-            </button>
-          ))}
+          {centers.length === 0 ? (
+            <div className="empty-reservations">
+              <AlertCircle size={48} />
+              <p>가입된 센터가 없습니다</p>
+            </div>
+          ) : (
+            centers.map((center) => (
+              <button
+                key={center.centerId}
+                className={`center-select-item ${selectedCenter?.centerId === center.centerId ? 'active' : ''}`}
+                onClick={() => handleCenterSelect(center)}
+              >
+                <span className="name">{center.name}</span>
+                {selectedCenter?.centerId === center.centerId && <Check size={20} className="check-icon" />}
+              </button>
+            ))
+          )}
         </div>
       </SlideDialog>
 
       <div className="ticket-carousel-container">
-        <div 
-          className={`ticket-carousel ${TICKETS.length === 1 ? 'is-single' : ''} ${isDragging ? 'dragging' : ''}`}
-          ref={carouselRef}
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onMouseLeave={onMouseUp}
-        >
-          {TICKETS.map((ticket, i) => {
-            const today = dayjs().startOf('day');
-            const endDate = dayjs(ticket.endDate).startOf('day');
-            const diffDays = endDate.diff(today, 'day');
-            const isExpired = diffDays < 0;
-
-            return (
-              <div 
-                key={ticket.ticketId} 
-                className={`premium-ticket ${ticket.ticketType === 'PT' ? 'pt-ticket' : ''} ${activeTicketIndex === i ? 'active' : ''} ${isExpired ? 'expired' : ''}`}
-              >
-                <div className="ticket-header">
-                  <span className="center-name">{ticket.centerName}</span>
-                  <span className={`status-badge ${isExpired ? 'expired' : ''}`}>{isExpired ? '기간만료' : '사용중'}</span>
-                </div>
-                <h2 className="ticket-name">{ticket.title}</h2>
-                <div className="usage-progress">
-                  <div className="label-row">
-                    <span>수강 현황</span>
-                    <span className="remaining">{ticket.stats.available} / {ticket.stats.cancelable}회</span>
-                  </div>
-                  <div className="progress-bar-bg">
-                    <div className="progress-bar-fill" style={{ width: `${(ticket.stats.available / ticket.stats.cancelable) * 100}%` }}></div>
-                  </div>
-                </div>
-                <div className="expiry-info">
-                  <CalendarDays size={14} />
-                  <span>
-                    {dayjs(ticket.startDate).format('YYYY. M. D')} ~ {dayjs(ticket.endDate).format('YYYY. M. D')}
-                    {!isExpired && (diffDays === 0 ? ' (오늘 만료)' : ` (${diffDays}일 남음)`)}
-                  </span>
-                </div>
+        {isLoadingTickets ? (
+          <div className="ticket-carousel">
+            <div className="premium-ticket skeleton-ticket">
+              <p>수강권 불러오는 중...</p>
+            </div>
+          </div>
+        ) : tickets.length === 0 ? (
+          <div className="ticket-carousel">
+            <div className="premium-ticket skeleton-ticket">
+              <div className="ticket-empty">
+                <CalendarDays size={32} />
+                <p>등록된 수강권이 없습니다</p>
               </div>
-            );
-          })}
-        </div>
-        <div className="stats-grid">
-          <div className="stat-item">
-            <div className="label-group">
-              <Activity size={14} />
-              <span className="label">이번 달 수강</span>
             </div>
-            <div className="value">{TICKETS[activeTicketIndex].ticketType === 'GROUP' ? '12' : '2'}<span>회</span></div>
           </div>
-          <div className="stat-item">
-            <div className="label-group">
-              <Trophy size={14} />
-              <span className="label">평균 수강 빈도</span>
-            </div>
-            <div className="value">{TICKETS[activeTicketIndex].ticketType === 'GROUP' ? '주 2.5' : '주 1.2'}<span>회</span></div>
-          </div>
-        </div>
+        ) : (
+          <div
+            className={`ticket-carousel ${tickets.length === 1 ? 'is-single' : ''} ${isDragging ? 'dragging' : ''}`}
+            ref={carouselRef}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onMouseLeave={onMouseUp}
+          >
+            {tickets.map((ticket, i) => {
+              const today = dayjs().startOf('day');
+              const endDate = dayjs(ticket.endDate).startOf('day');
+              const diffDays = endDate.diff(today, 'day');
+              const isExpired = diffDays < 0;
 
-        {TICKETS.length > 1 && (
+              return (
+                <div
+                  key={ticket.ticketId}
+                  className={`premium-ticket ${ticket.ticketType === 'PT' ? 'pt-ticket' : ''} ${activeTicketIndex === i ? 'active' : ''} ${isExpired ? 'expired' : ''}`}
+                >
+                  <div className="ticket-header">
+                    <span className="center-name">{selectedCenter?.name}</span>
+                    <span className={`status-badge ${isExpired ? 'expired' : ''}`}>{isExpired ? '기간만료' : '사용중'}</span>
+                  </div>
+                  <h2 className="ticket-name">{ticket.title}</h2>
+                  <div className="usage-progress">
+                    <div className="label-row">
+                      <span>수강 현황</span>
+                      <span className="remaining">{ticket.totalSessions - ticket.usedSessions} / {ticket.totalSessions}회</span>
+                    </div>
+                    <div className="progress-bar-bg">
+                      <div className="progress-bar-fill" style={{ width: `${((ticket.totalSessions - ticket.usedSessions) / ticket.totalSessions) * 100}%` }}></div>
+                    </div>
+                  </div>
+                  <div className="expiry-info">
+                    <CalendarDays size={14} />
+                    <span>
+                      {dayjs(ticket.startDate).format('YYYY. M. D')} ~ {ticket.endDate && dayjs(ticket.endDate).format('YYYY. M. D')}
+                      {ticket.endDate && !isExpired && (diffDays === 0 ? ' (오늘 만료)' : ` (${diffDays}일 남음)`)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {tickets.length > 1 && (
           <div className="carousel-indicators">
-            {TICKETS.map((_, i) => (
-              <div 
-                key={i} 
+            {tickets.map((_, i) => (
+              <div
+                key={i}
                 className={`dot ${activeTicketIndex === i ? 'active' : ''}`}
                 onClick={() => scrollToIndex(i)}
                 style={{ cursor: 'pointer' }}
@@ -367,7 +409,7 @@ export default function HomePage() {
           <button className="view-all" onClick={() => setIsAllReservationsOpen(true)}>예약 전체보기</button>
         </div>
 
-        <div 
+        <div
           className={`date-selector ${isDateDragging ? 'dragging' : ''}`}
           ref={dateScrollRef}
           onMouseDown={onDateMouseDown}
@@ -376,8 +418,8 @@ export default function HomePage() {
           onMouseLeave={onDateMouseUp}
         >
           {dateRange.map((d) => (
-            <div 
-              key={d.full} 
+            <div
+              key={d.full}
               className={`date-item ${selectedDate === d.full ? 'active' : ''} ${d.isSunday ? 'sun' : ''} ${d.isSaturday ? 'sat' : ''} ${d.month ? 'has-month' : ''}`}
               onClick={() => !isDateDragging && setSelectedDate(d.full)}
             >
@@ -388,15 +430,19 @@ export default function HomePage() {
           ))}
         </div>
 
-        {reservationsForDate.length > 0 ? (
+        {isLoadingReservations ? (
+          <div className="empty-reserved-card">
+            <p>예약 정보를 불러오는 중...</p>
+          </div>
+        ) : reservationsForDate.length > 0 ? (
           reservationsForDate.map(res => (
             <ReservedCard key={res.reservationId} reservation={res} onCancel={handleCancel} />
           ))
         ) : (
           <div className="empty-reserved-card">
             <AlertCircle size={40} className="empty-icon" />
-            <p>선택하신 날짜에 예약된 수업이 없습니다.</p>
-            <button className="go-reserve-btn" onClick={() => window.location.href='/reserve'}>
+            <p>선택하신 날짜에 예약된 수업이 없습니다</p>
+            <button className="go-reserve-btn" onClick={() => window.location.href = '/reserve'}>
               수업 예약하러 가기
             </button>
           </div>
@@ -411,20 +457,19 @@ export default function HomePage() {
         <div className="all-reservations-view">
           <div className="current-center-info">
             <MapPin size={16} />
-            <span>{selectedCenter}</span>
+            <span>{selectedCenter?.name || '소속센터 없음'}</span>
           </div>
 
-          {myReservations.length > 0 ? (
+          {allReservations.length > 0 ? (
             <div className="res-list">
-              {myReservations.map((res) => (
+              {allReservations.map((res) => (
                 <ReservedCard key={res.reservationId} reservation={res} onCancel={handleCancel} />
               ))}
             </div>
           ) : (
             <div className="empty-reservations">
               <AlertCircle size={48} />
-              <p>예약된 수업이 없습니다.</p>
-              <button className="go-reserve" onClick={() => window.location.href='/reserve'}>수업 예약하러 가기</button>
+              <p>예약된 수업이 없습니다</p>
             </div>
           )}
         </div>

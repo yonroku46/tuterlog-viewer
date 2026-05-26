@@ -28,27 +28,20 @@ declare global {
   type TicketType = 'GROUP' | 'PT';
   type ContentType = 'TICKET' | 'PRODUCT' | 'RESERVATION' | 'CENTER';
   type NotificationIconType = 'LOGO' | 'AVATAR';
-  type ReservationStatus = 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NOSHOW' | 'WAITING';
+  type ReservationStatus = 'COMPLETED' | 'CONFIRMED' | 'CANCELLED' | 'NOSHOW' | 'WAITING';
   type ProfileMenuType = 'CENTER' | 'EDIT_PROFILE' | 'TICKET' | 'PRODUCT' | 'HISTORY' | 'NOTICE_SETTING' | 'SYSTEM_SETTING' | 'PRIVACY' | 'CUSTOMER_CENTER' | null;
   interface Ticket {
     ticketId: string;
-    userId?: string;
-    centerId?: string;
+    userId: string;
+    centerId: string;
     ticketType: TicketType;
     title: string;
     subTitle: string;
-    centerName: string;
-    stats: {
-      available: number;
-      cancelable: number;
-      remaining: number | string;
-    };
     startDate: string;
     endDate: string;
-    remainingDays?: number;
-    totalSessions?: number;
-    usedSessions?: number;
-    isPT?: boolean;
+    totalSessions: number;
+    usedSessions: number;
+    isPt: boolean;
     createTime: string;
   }
   interface Instructor {
@@ -61,19 +54,29 @@ declare global {
   }
   interface Reservation {
     reservationId: string;
-    userId?: string;
+    userId: string;
+    classId: string;
+    status: ReservationStatus;
+    createTime: string;
+  }
+  interface ReservationRes {
+    reservationId: string;
+    userId: string;
     classId: string;
     centerId: string;
+    status: ReservationStatus;
     reservationDate: string;
     startTime: string;
     endTime: string;
     className: string;
-    instructor: Instructor;
     room: string;
-    status: ReservationStatus;
-    reservedCount: number;
     capacity: number;
+    reservedCount: number;
     createTime: string;
+    instructorId: string;
+    instructorName: string;
+    instructorProfileImg: string;
+    instructorRole: string;
   }
   interface Center {
     centerId: string;
@@ -88,7 +91,8 @@ declare global {
     authorId?: string;
     center: string;
     content: string;
-    images: string[];
+    images: string;
+    imageList?: string[];
     likes: number;
     liked?: boolean;
     comments: CenterPostComment[]
@@ -191,4 +195,4 @@ declare global {
   }
 }
 
-export {};
+export { };

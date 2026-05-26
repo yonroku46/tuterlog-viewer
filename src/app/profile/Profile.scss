@@ -1,7 +1,7 @@
 .profile-page {
   padding: 1.25rem;
   background: var(--bg);
-  min-height: 100%;
+  min-height: calc(100% - var(--bottom-nav-height));
 
   .user-info-section {
     display: flex;
@@ -41,6 +41,7 @@
         margin-bottom: 0.25rem;
         color: #1c1c1e;
       }
+
       .details {
         font-size: 0.8125rem;
         color: #8e8e93;
@@ -103,7 +104,7 @@
         gap: 0.75rem;
         font-size: 1rem;
         font-weight: 500;
-        
+
         .icon-wrapper {
           color: #1c1c1e;
         }
@@ -123,9 +124,11 @@
 
       &.logout {
         color: #ff3b30;
+
         .left .icon-wrapper {
           color: #ff3b30;
         }
+
         span {
           color: #ff3b30;
         }
@@ -210,7 +213,8 @@
       border: 1px solid #f2f2f7;
       overflow: hidden;
 
-      .setting-item, .menu-item {
+      .setting-item,
+      .menu-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -222,7 +226,9 @@
         border-right: none;
         border-top: none;
 
-        &:last-child { border-bottom: none; }
+        &:last-child {
+          border-bottom: none;
+        }
 
         span {
           font-size: 0.9375rem;
@@ -259,11 +265,12 @@
             top: 0.125rem;
             left: 0.125rem;
             transition: transform 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           }
 
           &.active {
             background: #34c759;
+
             &::after {
               transform: translateX(1.25rem);
             }
@@ -276,9 +283,11 @@
 
         &.logout {
           color: #ff3b30;
+
           .left .icon-wrapper {
             color: #ff3b30;
           }
+
           span {
             color: #ff3b30;
           }
@@ -383,7 +392,7 @@
           align-items: center;
           justify-content: center;
           border: 2px solid #fff;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
       }
     }
@@ -391,7 +400,7 @@
 
   .write-dialog-footer {
     width: 100%;
-    
+
     .submit-btn {
       width: 100%;
       height: 3.5rem;
@@ -422,7 +431,9 @@
   }
 }
 
-.center-search-content, .ticket-content, .history-list {
+.center-search-content,
+.ticket-content,
+.history-list {
   padding-bottom: 2rem;
 }
 
@@ -509,6 +520,7 @@
         font-weight: 600;
         margin-bottom: 0.25rem;
       }
+
       .detail {
         font-size: 0.9375rem;
         font-weight: 500;
@@ -519,7 +531,7 @@
 
 .version-info {
   margin-top: auto;
-  padding: 2rem 0 1rem;
+  padding: 2rem 0 0;
   text-align: center;
   font-size: 0.8125rem;
   color: #aeaeb2;
@@ -528,7 +540,7 @@
 /* Privacy & Customer Center */
 .privacy-content {
   padding: 0 0.25rem 2rem;
-  
+
   .privacy-card {
     background: #fff;
     padding: 1.5rem;
@@ -538,14 +550,14 @@
 
     .privacy-section {
       margin-bottom: 1.75rem;
-      
+
       h4 {
         font-size: 0.9375rem;
         font-weight: 700;
         color: #1c1c1e;
         margin-bottom: 0.75rem;
       }
-      
+
       p {
         font-size: 0.875rem;
         line-height: 1.7;
@@ -574,7 +586,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding-bottom: 3rem;
+  height: 100%;
 
   .contact-email-section {
     .email-card {
@@ -600,12 +612,14 @@
 
       .text-group {
         flex: 1;
+
         .label {
           font-size: 0.8125rem;
           font-weight: 600;
           color: #8e8e93;
           margin-bottom: 0.125rem;
         }
+
         .value {
           font-size: 0.9375rem;
           font-weight: 700;
@@ -690,7 +704,8 @@
     background: #f2f2f7;
     padding: 1.25rem;
     border-radius: 1rem;
-    
+    margin-top: auto;
+
     h5 {
       font-size: 0.8125rem;
       font-weight: 700;

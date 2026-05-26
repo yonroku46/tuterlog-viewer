@@ -8,18 +8,24 @@
   --primary-rgb: 0, 122, 255;
   --primary-dark: #0062cc;
   --secondary-rgb: 88, 86, 214;
+  --bottom-nav-height: 4.375rem;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+
   &:focus {
     outline: none;
   }
 }
 
-button, input, textarea, select, a {
+button,
+input,
+textarea,
+select,
+a {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -71,7 +77,7 @@ button {
   &::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.025);
     border-radius: 0.625rem;
-    
+
     &:hover {
       background: rgba(0, 0, 0, 0.05);
     }
@@ -191,7 +197,9 @@ button {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // Custom Snackbar Styles
@@ -231,25 +239,34 @@ button {
     color: #8e8e93;
     opacity: 0.6;
     transition: opacity 0.2s;
+
     &:hover {
       opacity: 1;
     }
   }
 
   &.variant-success {
-    .snackbar-icon { color: #34c759; }
+    .snackbar-icon {
+      color: #34c759;
+    }
   }
 
   &.variant-error {
-    .snackbar-icon { color: #ff3b30; }
+    .snackbar-icon {
+      color: #ff3b30;
+    }
   }
 
   &.variant-warning {
-    .snackbar-icon { color: #ff9500; }
+    .snackbar-icon {
+      color: #ff9500;
+    }
   }
 
   &.variant-info {
-    .snackbar-icon { color: #007aff; }
+    .snackbar-icon {
+      color: #007aff;
+    }
   }
 }
 
@@ -258,7 +275,7 @@ button {
     background: rgba(44, 44, 46, 0.9);
     color: #ffffff;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
-    
+
     .snackbar-close {
       color: #8e8e93;
     }

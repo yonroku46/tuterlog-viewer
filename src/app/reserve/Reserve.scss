@@ -1,7 +1,7 @@
 .reserve-page {
   background: var(--bg);
-  min-height: 100%;
   padding-bottom: 2rem;
+  min-height: calc(100% - var(--bottom-nav-height));
 
   .filter-bar {
     margin: 0 1.25rem 1rem;
@@ -23,6 +23,7 @@
         color: #8e8e93;
         font-weight: 500;
       }
+
       .center-name {
         font-size: 0.9375rem;
         color: #1c1c1e;
@@ -83,7 +84,10 @@
           &.active {
             border-color: #007aff;
             background: #f0f7ff;
-            .name { color: #007aff; }
+
+            .name {
+              color: #007aff;
+            }
           }
 
           .name {
@@ -112,8 +116,10 @@
     .react-calendar {
       width: 100%;
       font-family: inherit;
-      
-      button, span, abbr {
+
+      button,
+      span,
+      abbr {
         font-family: inherit !important;
       }
 
@@ -135,7 +141,8 @@
           color: #1c1c1e;
           min-width: 2.75rem;
 
-          &:enabled:hover, &:enabled:focus {
+          &:enabled:hover,
+          &:enabled:focus {
             background: none;
           }
         }
@@ -167,8 +174,13 @@
             padding: 0.5rem;
 
             /* Sunday and Saturday coloring */
-            &:nth-child(1) { color: #ff3b30; }
-            &:nth-child(7) { color: #007aff; }
+            &:nth-child(1) {
+              color: #ff3b30;
+            }
+
+            &:nth-child(7) {
+              color: #007aff;
+            }
           }
         }
       }
@@ -186,7 +198,7 @@
         font-weight: 500;
         color: #1c1c1e;
         border-radius: 0.5rem;
-        
+
         abbr {
           display: flex;
           align-items: center;
@@ -211,7 +223,8 @@
             box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
           }
 
-          &:enabled:hover, &:enabled:focus {
+          &:enabled:hover,
+          &:enabled:focus {
             background: none !important;
           }
         }
@@ -254,7 +267,10 @@
     overflow-x: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    &::-webkit-scrollbar { display: none; }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     .time-chip {
       flex: 0 0 auto;
@@ -286,7 +302,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    
+
     .empty-state {
       padding: 4rem 2rem;
       text-align: center;
@@ -314,7 +330,7 @@
           align-items: center;
           gap: 0.125rem;
           position: relative;
-          
+
           .start {
             font-size: 1.0625rem;
             font-weight: 800;
@@ -349,7 +365,7 @@
         align-items: center;
         justify-content: space-between;
         border: 1px solid #f2f2f7;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
         transition: all 0.2s;
 
         &:active {
@@ -370,6 +386,7 @@
               color: #1c1c1e;
               margin: 0 0 0.25rem;
             }
+
             .room {
               font-size: 0.75rem;
               color: #8e8e93;
@@ -381,7 +398,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            
+
             .instructor {
               font-size: 0.8125rem;
               color: #3a3a3c;
@@ -405,7 +422,10 @@
               }
 
               &.is-available {
-                svg { color: #007aff; }
+                svg {
+                  color: #007aff;
+                }
+
                 .count {
                   color: #007aff;
                   font-weight: 700;
@@ -413,7 +433,10 @@
               }
 
               &.is-full {
-                svg { color: #d1d1d6; }
+                svg {
+                  color: #d1d1d6;
+                }
+
                 .count {
                   color: #8e8e93;
                 }
@@ -472,6 +495,7 @@
           color: #1c1c1e;
           margin: 0 0 0.25rem;
         }
+
         .instructor {
           font-size: 0.9375rem;
           color: #8e8e93;
@@ -508,6 +532,7 @@
             color: #8e8e93;
             font-weight: 500;
           }
+
           .val {
             font-size: 0.9375rem;
             font-weight: 700;
@@ -531,8 +556,10 @@
         align-items: center;
         gap: 0.375rem;
         margin: 0 0 0.75rem;
-        
-        svg { color: #007aff; }
+
+        svg {
+          color: #007aff;
+        }
       }
 
       ul {
@@ -579,7 +606,7 @@
     &.is-full {
       background: #ff9500;
       box-shadow: 0 8px 20px rgba(255, 149, 0, 0.25);
-      
+
       &:active {
         background: #e68600;
       }

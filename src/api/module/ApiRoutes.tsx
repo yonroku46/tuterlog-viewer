@@ -27,6 +27,11 @@ const PROFILE_PRODUCTS = `${PROFILE_ROOT}/products`;
 const PROFILE_HISTORY = `${PROFILE_ROOT}/history`;
 const PROFILE_NOTIFICATION = `${PROFILE_ROOT}/notification-settings`;
 
+// home (center-specific)
+const HOME_TICKETS_BY_CENTER = `${PROFILE_ROOT}/tickets/center`;
+const HOME_RESERVATIONS = `${PROFILE_ROOT}/reservations`;
+const HOME_RESERVATION_CANCEL = `${PROFILE_ROOT}/reservations/cancel`;
+
 // notification
 const NOTIFICATION_ROOT = `${ROOT}/notification`;
 const NOTIFICATION_LIST = `${NOTIFICATION_ROOT}/list`;
@@ -67,6 +72,9 @@ const ApiRoutes = {
   PROFILE_PRODUCTS,
   PROFILE_HISTORY,
   PROFILE_NOTIFICATION,
+  HOME_TICKETS_BY_CENTER,
+  HOME_RESERVATIONS,
+  HOME_RESERVATION_CANCEL,
   NOTIFICATION_LIST,
   NOTIFICATION_READ,
   NOTIFICATION_READ_ALL,

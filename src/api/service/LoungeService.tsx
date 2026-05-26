@@ -36,7 +36,7 @@ export interface CreateCommentParams {
 class LoungeService {
   private static instance: LoungeService;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): LoungeService {
     if (!LoungeService.instance) {
@@ -238,22 +238,6 @@ class LoungeService {
       }
     } catch (error) {
       console.error('[LoungeService] deleteComment', error);
-      throw error;
-    }
-  }
-
-  /**
-   * 가입된 센터 목록 조회 (필터 칩용)
-   * GET /center/list
-   */
-  async getCenterList(): Promise<ListRes<Center> | undefined> {
-    try {
-      const response: ApiResponse = await ApiInstance.get(ApiRoutes.CENTER_LIST);
-      if (response && !response.hasErrors) {
-        return response.responseData as ListRes<Center>;
-      }
-    } catch (error) {
-      console.error('[LoungeService] getCenterList', error);
       throw error;
     }
   }
