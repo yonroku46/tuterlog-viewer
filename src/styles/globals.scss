@@ -29,6 +29,14 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+@media screen and (max-width: 768px) {
+  input:focus,
+  select:focus,
+  textarea:focus {
+    font-size: 16px !important;
+  }
+}
+
 html,
 body {
   height: 100%;

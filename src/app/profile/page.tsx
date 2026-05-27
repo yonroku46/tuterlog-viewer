@@ -537,9 +537,8 @@ export default function ProfilePage() {
               />
             </div>
             <div className="user-text">
-                  <h2 className="name">{profile?.name ?? '—'} 님</h2>
+                  <h2 className="name">{profile?.name ?? '—'}님</h2>
                   <p className="details">
-                    {profile?.phone ?? '—'} · {profile?.gender === 'M' ? '남성' : profile?.gender === 'F' ? '여성' : profile?.gender === 'O' ? '기타' : '성별 미설정'}<br />
                     {profile?.email ?? '—'}
                   </p>
             </div>
