@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowLeft } from 'lucide-react';
 import './SlideDialog.scss';
 
@@ -10,11 +11,17 @@ interface SlideDialogProps {
   footer?: React.ReactNode;
   rightElement?: React.ReactNode;
   noPadding?: boolean;
+  className?: string;
 }
 
-const SlideDialog: React.FC<SlideDialogProps> = ({ isOpen, onClose, title, children, footer, rightElement, noPadding }) => {
+export default function SlideDialog({ isOpen, onClose, title, children, footer, rightElement, noPadding, className }: SlideDialogProps) {
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [active, setActive] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -42,9 +49,11 @@ const SlideDialog: React.FC<SlideDialogProps> = ({ isOpen, onClose, title, child
     }
   }, [isOpen, onClose]);
 
-  if (!shouldRender) return null;
+  if (!shouldRender || !mounted) return null;
 
-  return (
+  const dialogRoot = document.getElementById('dialog-root') || document.body;
+
+  return createPortal(
     <div className={`slide-dialog-overlay ${active ? 'open' : ''}`} onClick={onClose}>
       <div 
         className={`slide-dialog-content ${active ? 'open' : ''}`} 
@@ -60,16 +69,27 @@ const SlideDialog: React.FC<SlideDialogProps> = ({ isOpen, onClose, title, child
           </div>
         </header>
         <div className={`dialog-body ${noPadding ? 'no-padding' : ''}`}>
-          {children}
+          {className ? (
+            <div className={className} style={{ display: 'contents' }}>
+              {children}
+            </div>
+          ) : (
+            children
+          )}
         </div>
         {footer && (
           <footer className="dialog-footer">
-            {footer}
+            {className ? (
+              <div className={className} style={{ display: 'contents' }}>
+                {footer}
+              </div>
+            ) : (
+              footer
+            )}
           </footer>
         )}
       </div>
-    </div>
+    </div>,
+    dialogRoot
   );
 };
-
-export default SlideDialog;

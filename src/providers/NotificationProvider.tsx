@@ -78,7 +78,12 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       });
 
       eventSourceRef.current.onerror = (error: any) => {
-        console.error('[SSE] Connection error:', error);
+        console.error('[SSE] Connection error details:', {
+          status: error?.status,
+          readyState: eventSourceRef.current?.readyState,
+          message: error?.message || 'Unknown SSE error event',
+          error
+        });
         setSseStatus('error');
         if (eventSourceRef.current) {
           eventSourceRef.current.close();

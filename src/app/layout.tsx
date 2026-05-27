@@ -38,6 +38,7 @@ export default function RootLayout({
                   {children}
                 </div>
                 <BottomNav />
+                <div id="dialog-root" />
               </main>
             </SnackbarProvider>
           </NotificationProvider>

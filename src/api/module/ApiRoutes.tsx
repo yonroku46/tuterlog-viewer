@@ -32,6 +32,11 @@ const HOME_TICKETS_BY_CENTER = `${PROFILE_ROOT}/tickets/center`;
 const HOME_RESERVATIONS = `${PROFILE_ROOT}/reservations`;
 const HOME_RESERVATION_CANCEL = `${PROFILE_ROOT}/reservations/cancel`;
 
+// reserve
+const RESERVE_ROOT = `${ROOT}/reserve`;
+const RESERVE_CLASSES = `${RESERVE_ROOT}/classes`;
+const RESERVE_BOOK = `${RESERVE_ROOT}/book`;
+
 // notification
 const NOTIFICATION_ROOT = `${ROOT}/notification`;
 const NOTIFICATION_LIST = `${NOTIFICATION_ROOT}/list`;
@@ -75,6 +80,8 @@ const ApiRoutes = {
   HOME_TICKETS_BY_CENTER,
   HOME_RESERVATIONS,
   HOME_RESERVATION_CANCEL,
+  RESERVE_CLASSES,
+  RESERVE_BOOK,
   NOTIFICATION_LIST,
   NOTIFICATION_READ,
   NOTIFICATION_READ_ALL,
