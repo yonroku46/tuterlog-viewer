@@ -140,9 +140,15 @@ export default function ReservePage() {
       {/* 센터/수업 유형 필터 바 */}
       <div className="filter-bar">
         <div className="filter-info">
-          <span className="center-name">{isLoadingClasses ? '불러오는 중...' : (`${selectedCenter?.name} 수업 일정` ?? '소속센터 없음')}</span>
+          <span className="center-name">
+            {isLoadingClasses && '불러오는 중...'}
+            {!isLoadingClasses && centers.length > 0 && `${selectedCenter?.name} 수업 일정`}
+            {!isLoadingClasses && centers.length === 0 && '소속센터 없음'}
+          </span>
         </div>
-        <button className="change-btn" onClick={() => setIsFilterOpen(true)}>변경</button>
+        <button className="change-btn" disabled={centers.length === 0} onClick={() => setIsFilterOpen(true)}>
+          변경
+        </button>
       </div>
 
       {/* 센터 선택 다이얼로그 */}

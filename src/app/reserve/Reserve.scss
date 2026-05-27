@@ -43,6 +43,13 @@
         background: #e5f1ff;
         transform: scale(0.95);
       }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+        filter: grayscale(0.8);
+      }
     }
   }
 
@@ -198,8 +205,15 @@
           transition: all 0.2s;
         }
 
-        &--neighboringMonth {
-          color: #d1d1d6;
+        &.react-calendar__month-view__days__day--neighboringMonth {
+          color: #aeaeb2;
+          opacity: 0.35;
+          transition: all 0.2s;
+
+          &:enabled:hover {
+            opacity: 0.7;
+            background-color: #f2f2f7 !important;
+          }
         }
 
         /* Circle highlight for selected day */
