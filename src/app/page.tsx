@@ -3,11 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/providers/AuthProvider';
-import {
-  Calendar, Users, BarChart3,
-  ArrowRight, CheckCircle2, Zap,
-  Shield, Bell
-} from 'lucide-react';
+import { Calendar, Users, BarChart3, ArrowRight, CheckCircle2, Zap, Shield, Bell } from 'lucide-react';
 import LandingNav from '@/components/layout/LandingNav';
 import LandingFooter from '@/components/layout/LandingFooter';
 import "./Landing.scss";

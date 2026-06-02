@@ -54,6 +54,10 @@ const AUTH_VERIFY_CONFIRM = `${AUTH_ROOT}/verify/confirm`;
 const AUTH_FORGOT_PASSWORD = `${AUTH_ROOT}/forgot-password`;
 const AUTH_RESET_PASSWORD = `${AUTH_ROOT}/reset-password`;
 
+// contact
+const CONTACT_ROOT = `${ROOT}/contact`;
+const CONTACT_SUBMIT = `${CONTACT_ROOT}/submit`;
+
 const ApiRoutes = {
   AUTH_LOGIN,
   AUTH_REGISTER,
@@ -86,6 +90,7 @@ const ApiRoutes = {
   NOTIFICATION_READ,
   NOTIFICATION_READ_ALL,
   NOTIFICATION_SUBSCRIBE,
+  CONTACT_SUBMIT,
 };
 
 export default ApiRoutes;

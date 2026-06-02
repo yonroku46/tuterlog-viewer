@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/providers/AuthProvider';
 import { Clock, CheckCircle, Send, Loader2 } from 'lucide-react';
 import LandingNav from '@/components/layout/LandingNav';
 import LandingFooter from '@/components/layout/LandingFooter';
+import ContactService from '@/api/service/ContactService';
 import './Contact.scss';
 
 const INQUIRY_TYPES = [
@@ -29,11 +30,17 @@ const INITIAL: FormState = { name: '', email: '', type: '', subject: '', message
 
 export default function ContactPage() {
   const { user } = useAuth();
-  const [form, setForm] = useState<FormState>({
-    ...INITIAL,
-    name: user?.name ?? '',
-    email: user?.email ?? '',
-  });
+  const [form, setForm] = useState<FormState>(INITIAL);
+
+  useEffect(() => {
+    if (user) {
+      setForm(f => ({
+        ...f,
+        name: f.name || user.name || '',
+        email: f.email || user.email || '',
+      }));
+    }
+  }, [user]);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -45,16 +52,25 @@ export default function ContactPage() {
     e.preventDefault();
     setSending(true);
 
-    const body = encodeURIComponent(
-      `이름: ${form.name}\n이메일: ${form.email}\n유형: ${form.type}\n제목: ${form.subject}\n\n${form.message}`
-    );
-    const mailto = `mailto:support@univus.jp?subject=[TuterLog 문의] ${encodeURIComponent(form.subject)}&body=${body}`;
-    
-    setTimeout(() => {
-      window.location.href = mailto;
+    try {
+      const res = await ContactService.submitInquiry({
+        name: form.name,
+        email: form.email,
+        type: form.type,
+        subject: form.subject,
+        message: form.message,
+      });
+      if (res && res.success) {
+        setSent(true);
+      } else {
+        alert('문의 접수에 실패했습니다. 다시 시도해 주세요.');
+      }
+    } catch (error) {
+      console.error('[ContactPage] submit error', error);
+      alert('문의 접수 중 오류가 발생했습니다. 다시 시도해 주세요.');
+    } finally {
       setSending(false);
-      setSent(true);
-    }, 1200);
+    }
   };
 
   const isValid = form.name && form.email && form.type && form.subject && form.message;
@@ -105,10 +121,10 @@ export default function ContactPage() {
                 <div className="contact-success-icon">
                   <CheckCircle size={28} />
                 </div>
-                <h2 className="contact-success-title">문의 메일이 준비되었습니다</h2>
+                <h2 className="contact-success-title">문의가 접수되었습니다</h2>
                 <p className="contact-success-sub">
-                  메일 앱이 실행되었습니다. <br />
-                  발송 버튼을 누르면 접수가 완료됩니다.
+                  문의해주신 내용이 정상적으로 접수되었습니다.<br />
+                  담당자 확인 후 이메일로 답변해 드리겠습니다.
                 </p>
                 <button
                   className="contact-submit-btn"
@@ -202,9 +218,9 @@ export default function ContactPage() {
                       disabled={!isValid || sending}
                     >
                       {sending ? (
-                        <><Loader2 size={16} className="animate-spin" /> 전송중...</>
+                        <>전송중... <Loader2 size={16} className="animate-spin" /></>
                       ) : (
-                        <><Send size={16} /> 문의 메일 전송</>
+                        <>문의 메일 전송 <Send size={16} /></>
                       )}
                     </button>
                   </div>

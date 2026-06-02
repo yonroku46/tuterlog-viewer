@@ -154,6 +154,13 @@ declare global {
     iconType: NotificationIconType;
     createTime: string;
   }
+  interface InquiryReq {
+    name: string;
+    email: string;
+    type: string;
+    subject: string;
+    message: string;
+  }
   // UI Components
   interface TimeFilterOption {
     option: string;

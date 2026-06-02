@@ -272,6 +272,15 @@
   &.is-placeholder {
     color: #94a3b8;
   }
+
+  option {
+    color: #0f172a;
+    background-color: #fff;
+  }
+
+  option:disabled {
+    color: #94a3b8;
+  }
 }
 
 .contact-textarea {
