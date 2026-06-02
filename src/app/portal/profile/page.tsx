@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bell, Pencil, Smile, Building2, CreditCard, Package, Search, ChevronRight, Settings, ShieldCheck, HelpCircle, LogOut, Globe, Check, Image as ImageIcon, Phone, Mail, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell, UserPen, Smile, Building2, CreditCard, Package, Search, ChevronRight, Settings, ShieldCheck, HelpCircle, LogOut, Globe, Check, Image as ImageIcon, Mail, ChevronDown, ChevronUp } from 'lucide-react';
 import { useSnackbar } from 'notistack';
 import dayjs from 'dayjs';
 import SlideDialog from '@/components/dialog/SlideDialog';
@@ -532,22 +532,21 @@ export default function ProfilePage() {
                 alt="avatar" 
                 width={60} 
                 height={60} 
-                style={{ borderRadius: '50%' }}
                 fallback={<Smile size={32} />}
               />
             </div>
             <div className="user-text">
-                  <h2 className="name">{profile?.name ?? '—'}님</h2>
-                  <p className="details">
-                    {profile?.email ?? '—'}
-                  </p>
+              <h2 className="name">{profile?.name ?? '—'}님</h2>
+              <p className="details">
+                {profile?.email ?? '—'}
+              </p>
             </div>
             <button className="edit-btn" onClick={() => {
               setEditData({ name: profile?.name, phone: profile?.phone, email: profile?.email, gender: profile?.gender });
               setAvatarPreview(null);
               setActiveMenu('EDIT_PROFILE');
             }}>
-              <Pencil size={16} />
+              <UserPen size={18} />
             </button>
           </>
         )}

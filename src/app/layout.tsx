@@ -1,8 +1,7 @@
 import { generatePageMetadata } from '@/common/utils/metaUtils';
 import { Geist, Geist_Mono } from "next/font/google";
-import BottomNav from "@/components/layout/BottomNav";
-import Header from "@/components/layout/Header";
 import ScrollToTop from "@/components/layout/ScrollToTop";
+import MainWrapper from "@/components/layout/MainWrapper";
 import { AuthProvider } from '@/providers/AuthProvider';
 import { NotificationProvider } from '@/providers/NotificationProvider';
 import SnackbarProvider from '@/providers/SnackbarProvider';
@@ -32,14 +31,9 @@ export default function RootLayout({
           <NotificationProvider>
             <SnackbarProvider>
               <ScrollToTop />
-              <main>
-                <div className="content-area">
-                  <Header />
-                  {children}
-                </div>
-                <BottomNav />
-                <div id="dialog-root" />
-              </main>
+              <MainWrapper>
+                {children}
+              </MainWrapper>
             </SnackbarProvider>
           </NotificationProvider>
         </AuthProvider>

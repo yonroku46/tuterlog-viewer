@@ -4,6 +4,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import AuthService from '@/api/service/AuthService';
 
+export const servicePrefix = '/portal';
+
 interface AuthContextType {
   user: LoginUserRes | null;
   login: (email: string, password: string, stayLoggedIn?: boolean) => Promise<void>;
@@ -16,17 +18,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<LoginUserRes | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
-  // Public paths that don't require authentication
-  const publicPaths = ['/login', '/register', '/forgot-password'];
+  const authPaths = ['/login', '/register', '/forgot-password'];
 
   useEffect(() => {
     // Check if user is logged in (e.g., from localStorage or cookie)
-    const checkAuth = async () => {
-      setIsLoading(true);
+    const checkAuth = () => {
       try {
         const stored = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
         if (stored) {
@@ -35,8 +35,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error('Failed to parse user data:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -44,13 +42,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!isLoading) {
-      const isPublicPath = publicPaths.includes(pathname);
+    if (!isLoading && pathname) {
+      const isPrivatePath = pathname.startsWith(servicePrefix);
+      const isAuthPath = authPaths.includes(pathname);
 
-      if (!user && !isPublicPath) {
-        router.replace('/login');
-      } else if (user && isPublicPath) {
-        router.replace('/');
+      if (!user) {
+        if (isPrivatePath) {
+          router.replace('/login');
+        }
+      } else {
+        if (isAuthPath) {
+          router.replace(servicePrefix);
+        }
       }
     }
   }, [user, isLoading, pathname, router]);
@@ -63,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storage = stayLoggedIn ? localStorage : sessionStorage;
         storage.setItem('currentUser', JSON.stringify(res));
         setUser(res);
-        router.replace('/');
+        router.replace(`${servicePrefix}`);
       } else {
         throw new Error('Login failed');
       }
@@ -95,8 +98,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.replace('/login');
   };
 
-  const isPublicPath = publicPaths.includes(pathname);
-  const showLoading = isLoading || (!user && !isPublicPath) || (user && isPublicPath);
+  const isPrivatePath = pathname ? pathname.startsWith(servicePrefix) : false;
+  const isAuthPath = pathname ? authPaths.includes(pathname) : false;
+  const showLoading = isLoading || (!user && isPrivatePath) || (user && isAuthPath);
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Bell } from 'lucide-react';
 import SlideDialog from '@/components/dialog/SlideDialog';
 import NotificationList from '@/components/contents/NotificationList';
 import SseStatus from '@/components/contents/SseStatus';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth, servicePrefix } from '@/providers/AuthProvider';
 import { useNotification } from '@/providers/NotificationProvider';
 import './Header.scss';
 
@@ -16,28 +16,18 @@ const Header = () => {
   const { unreadCount } = useNotification();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
-  const [selectedCenter, setSelectedCenter] = useState('전체 센터');
-
-  useEffect(() => {
-    // Only run on client
-    const savedCenter = localStorage.getItem('selectedCenter');
-    if (savedCenter) {
-      setSelectedCenter(savedCenter);
-    }
-  }, [pathname]);
-
   const getPageConfig = (path: string) => {
     switch (path) {
-      case '/':
+      case `${servicePrefix}`:
         const userName = user?.name || '사용자';
         return { title: `안녕하세요, ${userName}님!` };
-      case '/lounge':
+      case `${servicePrefix}/lounge`:
         return { title: '라운지' };
-      case '/reserve':
+      case `${servicePrefix}/reserve`:
         return { title: '수업예약' };
-      case '/profile':
+      case `${servicePrefix}/profile`:
         return { title: '마이페이지' };
-      case '/notice':
+      case `${servicePrefix}/notice`:
         return { title: '공지사항' };
       default:
         return { title: '' };

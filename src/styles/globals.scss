@@ -47,16 +47,27 @@ body {
 }
 
 main {
-  max-width: 480px;
-  height: 100vh;
-  height: 100dvh;
-  position: relative;
-  margin: 0 auto;
-  box-shadow: 0 0 1.25rem rgba(0, 0, 0, .05);
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  &.service-main {
+    max-width: 480px;
+    height: 100vh;
+    height: 100dvh;
+    position: relative;
+    margin: 0 auto;
+    box-shadow: 0 0 1.25rem rgba(0, 0, 0, .05);
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &.public-main {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 button {
@@ -204,9 +215,57 @@ button {
   }
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+.not-found-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  background-color: #f8fafc;
+  animation: fadeIn 0.5s ease-out;
+
+  .error-illustration {
+    font-size: 10rem;
+    font-weight: 800;
+    position: relative;
+    color: rgba(99, 102, 241, 0.1);
+  }
+
+  .error-content {
+    max-width: 450px;
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      border-radius: 1rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2);
+
+      svg { transition: transform 0.2s; }
+    }
   }
 }
 
@@ -278,6 +337,17 @@ button {
       color: #007aff;
     }
   }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-color-scheme: dark) {

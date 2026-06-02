@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
-type MetadataType = 'home' | 'notice' | 'reserve' | 'tickets' | 'profile' | 'lounge' | 'login' | 'register' | 'forgot-password';
+type MetadataType = 'home' | 'contact' | 'pricing' | 'portal' | 'notice' | 'reserve' | 'profile' | 'lounge' | 'login' | 'register' | 'forgot-password';
 
 const APP_NAME = "TuterLog";
 const APP_DESCRIPTION = "선생님과 학생의 더 효율적인 클래스 관리를 돕는 스마트 매니저";
@@ -11,17 +11,25 @@ const PAGE_INFO: Record<MetadataType, { title: string; description?: string }> =
     title: '언어 교육 스마트 매니저',
     description: APP_DESCRIPTION
   },
+  contact: {
+    title: '문의하기',
+    description: '서비스에 대한 문의사항이나 제안을 남겨주시면 신속하게 답변해드리겠습니다.'
+  },
+  pricing: {
+    title: '요금제',
+    description: `${APP_NAME}의 합리적인 요금제를 확인하세요. 무료플랜으로 부담없이 시작할 수도 있습니다.`
+  },
+  portal: {
+    title: '홈',
+    description: `${APP_NAME}에서 센터와 수업을 한번에 관리하세요.`
+  },
   notice: {
     title: '공지사항',
     description: '센터의 새로운 소식과 안내사항을 확인하세요.'
   },
   reserve: {
-    title: '수업 예약',
+    title: '수업예약',
     description: '원하는 강사님과 수업 일정을 선택하여 예약하세요.'
-  },
-  tickets: {
-    title: '수강권 관리',
-    description: '나의 수강권 현황과 이용 내역을 확인하세요.'
   },
   profile: {
     title: '마이페이지',

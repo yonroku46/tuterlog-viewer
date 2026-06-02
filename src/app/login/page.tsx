@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import './Login.scss';
@@ -37,7 +38,10 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>Tuterlog</h1>
+          <div className="logo-wrapper">
+            <Image src="/assets/icons/logo-wide.svg" alt="TuterLog" width={52} height={24} />
+            TuterLog
+          </div>
           <p>배움의 기록, 오늘의 나를 완성합니다</p>
         </div>
 

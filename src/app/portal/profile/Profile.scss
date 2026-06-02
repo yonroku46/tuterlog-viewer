@@ -11,8 +11,8 @@
     border-radius: 1.5rem;
     margin-bottom: 1.25rem;
     box-shadow: 0 0.25rem 1.25rem rgba(0, 0, 0, 0.04);
-    position: relative;
     min-height: calc(6.75rem + 0.5rem);
+    position: relative;
 
     &.is-loading {
       display: flex;
@@ -22,13 +22,20 @@
     .avatar {
       width: 3.75rem;
       height: 3.75rem;
-      background: #e5f1ff;
+      background: #fff;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #007aff;
       flex-shrink: 0;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
     }
 
     .user-text {
@@ -50,22 +57,17 @@
     }
 
     .edit-btn {
-      background: #007aff;
-      color: #fff;
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
       width: 2.25rem;
       height: 2.25rem;
       border-radius: 0.75rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0.25rem 0.75rem rgba(0, 122, 255, 0.2);
       border: none;
       cursor: pointer;
-      transition: transform 0.2s;
-
-      &:active {
-        transform: scale(0.9);
-      }
     }
   }
 
