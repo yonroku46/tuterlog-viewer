@@ -65,8 +65,8 @@ const NAV_ITEMS = ['대시보드', '고객 관리', '일정 확인', '설정'];
 export default function LandingPage() {
   const { user } = useAuth();
 
-  const ctaHref = user ? '/portal' : '/login';
-  const ctaLabel = user ? '서비스 바로가기' : '무료로 시작하기';
+  const ctaHref = user ? (user.centerOwnerFlg ? '/portal' : '/manage/dashboard') : '/login';
+  const ctaLabel = user ? (user.centerOwnerFlg ? '센터관리 바로가기' : '서비스 바로가기') : '무료로 시작하기';
 
   return (
     <div className="landing-page">
@@ -121,7 +121,7 @@ export default function LandingPage() {
             <div className="landing-mockup-dot" />
             <div className="landing-mockup-dot" />
             <div className="landing-mockup-dot" />
-            <div className="landing-mockup-url">tuterlog.com/my/dashboard</div>
+            <div className="landing-mockup-url">tuterlog.com/manage/dashboard</div>
           </div>
           <div className="landing-mockup-body">
             <div className="landing-mock-sidebar">

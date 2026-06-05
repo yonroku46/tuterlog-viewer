@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import Calendar from 'react-calendar';
-import { User, Users, ChevronLeft, ChevronRight, Clock, MapPin, CheckCircle2, Check, AlertCircle } from 'lucide-react';
+import AppCalendar, { Value } from '@/components/contents/AppCalendar';
+import { User, Users, Clock, MapPin, CheckCircle2, Check, AlertCircle, ChevronRight } from 'lucide-react';
 import { useSnackbar } from 'notistack';
 import SlideDialog from '@/components/dialog/SlideDialog';
 import AppImage from '@/components/contents/AppImage';
@@ -12,8 +12,6 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import './Reserve.scss';
 
-dayjs.locale('ko');
-
 const TIME_FILTERS: TimeFilterOption[] = [
   { option: 'all', label: '전체', range: [0, 24] },
   { option: 'morning', label: '오전', range: [0, 12] },
@@ -21,8 +19,6 @@ const TIME_FILTERS: TimeFilterOption[] = [
   { option: 'evening', label: '저녁', range: [18, 24] },
 ];
 
-type ValuePiece = Date | null;
-type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 export default function ReservePage() {
   const [selectedDate, setSelectedDate] = useState<Value>(new Date());
@@ -187,16 +183,9 @@ export default function ReservePage() {
 
       {/* 달력 */}
       <section className="calendar-container">
-        <Calendar
+        <AppCalendar
           onChange={handleDateChange}
           value={selectedDate}
-          locale="ko-KR"
-          next2Label={null}
-          prev2Label={null}
-          prevLabel={<ChevronLeft size={20} />}
-          nextLabel={<ChevronRight size={20} />}
-          formatDay={(locale, date) => dayjs(date).format('D')}
-          calendarType="gregory"
         />
       </section>
 

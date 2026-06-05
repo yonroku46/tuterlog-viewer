@@ -1,3 +1,5 @@
+@use '../../styles/mixins' as *;
+
 .slide-dialog-overlay {
   position: absolute;
   top: 0;
@@ -89,5 +91,55 @@
     flex-shrink: 0;
     border-top: 1px solid #e5e5ea;
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
+  }
+}
+
+@include pc {
+  .slide-dialog-overlay.manage-page {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+  }
+  .slide-dialog-content.manage-page {
+    position: relative;
+    width: 520px;
+    height: auto;
+    max-height: 85vh;
+    border-radius: 1rem;
+    transform: translateY(20px) scale(0.98);
+    opacity: 0;
+    overflow: hidden;
+    &.open {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .dialog-header {
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      .back-btn {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+      }
+      .dialog-title {
+        position: static;
+        transform: none;
+        margin: 0;
+        text-align: left;
+        font-size: 1.125rem;
+      }
+    }
+    .dialog-body {
+      background: var(--bg);
+      padding: 1.5rem;
+    }
   }
 }

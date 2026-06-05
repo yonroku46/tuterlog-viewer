@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 
-type MetadataType = 'home' | 'contact' | 'pricing' | 'portal' | 'notice' | 'reserve' | 'profile' | 'lounge' | 'login' | 'register' | 'forgot-password';
+type MetadataType = 'home' | 'contact' | 'pricing' | 'portal' | 'notice' | 'reserve' | 'profile' | 'lounge' |
+                    'manage' | 'manage/dashboard' | 
+                    'login' | 'register' | 'forgot-password';
 
 const APP_NAME = "TuterLog";
 const APP_DESCRIPTION = "선생님과 학생의 더 효율적인 클래스 관리를 돕는 스마트 매니저";
@@ -50,6 +52,14 @@ const PAGE_INFO: Record<MetadataType, { title: string; description?: string }> =
   'forgot-password': {
     title: '비밀번호 찾기',
     description: '잊으신 비밀번호를 안전하게 찾고 재설정하세요.'
+  },
+  manage: {
+    title: '관리',
+    description: `${APP_NAME}에서 수업과 고객을 효율적으로 관리하세요.`
+  },
+  'manage/dashboard': {
+    title: '대시보드',
+    description: `센터의 수업 스케줄과 매출 현황을 한눈에 확인할 수 있습니다.`
   }
 };
 

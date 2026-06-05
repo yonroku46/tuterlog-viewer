@@ -80,6 +80,7 @@ declare global {
   }
   interface Center {
     centerId: string;
+    ownerId: string;
     name: string;
     address: string;
     phone?: string;
@@ -176,6 +177,7 @@ declare global {
     gender: string;
     token: string;
     refreshToken: string;
+    centerOwnerFlg?: boolean;
   }
   // DB
   interface UserProfile {

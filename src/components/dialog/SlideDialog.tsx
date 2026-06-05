@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 import './SlideDialog.scss';
 
 interface SlideDialogProps {
@@ -54,14 +54,14 @@ export default function SlideDialog({ isOpen, onClose, title, children, footer, 
   const dialogRoot = document.getElementById('dialog-root') || document.body;
 
   return createPortal(
-    <div className={`slide-dialog-overlay ${active ? 'open' : ''}`} onClick={onClose}>
+    <div className={`slide-dialog-overlay ${active ? 'open' : ''} ${className || ''}`} onClick={onClose}>
       <div 
-        className={`slide-dialog-content ${active ? 'open' : ''}`} 
+        className={`slide-dialog-content ${active ? 'open' : ''} ${className || ''}`} 
         onClick={(e) => e.stopPropagation()}
       >
         <header className="dialog-header">
           <button className="back-btn" onClick={onClose}>
-            <ArrowLeft size={24} />
+            {className?.includes('manage-page') ? <X size={22} /> : <ArrowLeft size={24} />}
           </button>
           <h2 className="dialog-title">{title}</h2>
           <div className="header-right">
