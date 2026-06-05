@@ -947,13 +947,12 @@
       }
       .preview-container {
         position: relative;
-        border: 2px dashed var(--slate-300);
+        border: 1px dashed var(--slate-300);
         background: var(--slate-50);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        cursor: pointer;
         transition: all 0.2s ease;
         &:hover {
           border-color: var(--manage-primary);
@@ -985,6 +984,7 @@
           align-items: center;
           justify-content: center;
           opacity: 0;
+          cursor: pointer;
           transition: opacity 0.2s ease;
         }
       }
@@ -1200,7 +1200,7 @@
     background: var(--slate-50);
     transition: all 0.2s ease;
     &:focus-visible {
-      background: var(--card-bg);
+      background-color: var(--card-bg);
       border-color: var(--manage-primary);
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
