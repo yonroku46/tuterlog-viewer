@@ -118,7 +118,7 @@ export default function NoticePage() {
         onClose={() => setSelectedNotice(null)}
         title="공지사항"
         noPadding
-        className="notice-page"
+        className="notice-dialog"
       >
         {selectedNotice && (
           <div className="notice-detail">

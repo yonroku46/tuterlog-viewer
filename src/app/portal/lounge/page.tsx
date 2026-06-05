@@ -548,7 +548,7 @@ export default function LoungePage() {
         }}
         title={selectedPost ? `${selectedPost.author.name}님의 글에 댓글` : '댓글'}
         noPadding
-        className="lounge-page"
+        className="lounge-dialog"
         footer={
           <div className="comment-input-area">
             <input
@@ -629,7 +629,7 @@ export default function LoungePage() {
         isOpen={isWriteDialogOpen}
         onClose={handleCloseWriteDialog}
         title={editingPost ? '게시글 수정' : '새 글 작성'}
-        className="lounge-page"
+        className="lounge-dialog"
         footer={
           <div className="write-dialog-footer">
             <button

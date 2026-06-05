@@ -610,7 +610,7 @@ export default function ProfilePage() {
         isOpen={activeMenu !== null}
         onClose={handleBack}
         title={getMenuTitle()}
-        className="profile-page"
+        className="profile-dialog"
         footer={activeMenu === 'EDIT_PROFILE' ? (
           <div className="write-dialog-footer">
             <button className="submit-btn active" onClick={handleUpdateProfile}>저장하기</button>

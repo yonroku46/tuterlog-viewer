@@ -152,7 +152,7 @@ export default function ReservePage() {
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         title="센터 선택"
-        className="reserve-page"
+        className="reserve-dialog"
       >
         <div className="class-filter-list">
           {centers.length === 0 ? (
@@ -245,7 +245,7 @@ export default function ReservePage() {
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
         title="수업 상세 정보"
-        className="reserve-page"
+        className="reserve-dialog"
         footer={selectedClass && (
           <button
             className={`reserve-action-btn ${selectedClass.reservedCount >= selectedClass.capacity ? 'is-full' : ''}`}

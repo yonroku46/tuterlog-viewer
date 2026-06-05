@@ -1,28 +1,28 @@
 .notice-page {
   background: var(--bg);
   min-height: calc(100% - var(--bottom-nav-height));
+}
 
+.notice-page,
+.notice-dialog {
   .tabs {
     display: flex;
     padding: 0 1rem;
-    border-bottom: 1px solid #e5e5ea;
+    border-bottom: 1px solid var(--border);
     background: var(--bg);
-
     .tab {
       flex: 1;
       padding: 1rem 0;
       text-align: center;
       font-size: 0.9375rem;
       font-weight: 600;
-      color: #8e8e93;
+      color: var(--text-secondary);
       cursor: pointer;
       position: relative;
       background: none;
       border: none;
-
       &.active {
-        color: #1c1c1e;
-
+        color: var(--text-primary);
         &::after {
           content: '';
           position: absolute;
@@ -30,72 +30,62 @@
           left: 0;
           right: 0;
           height: 2px;
-          background: #1c1c1e;
+          background: var(--text-primary);
         }
       }
     }
   }
-
   .notice-list {
     padding: 0.75rem 1.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-
     .notice-item {
       display: flex;
       flex-direction: column;
       padding: 1rem;
-      background: #fff;
+      background: var(--card-bg);
       border-radius: 1rem;
       text-decoration: none;
       transition: background 0.2s;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-
       &:active {
-        background: #f2f2f7;
+        background: var(--bg);
       }
-
       .notice-top {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         margin-bottom: 0.5rem;
-
         .tag {
           font-size: 0.75rem;
           font-weight: 700;
           padding: 0.125rem 0.5rem;
           border-radius: 0.25rem;
-          background: #f2f2f7;
-          color: #8e8e93;
-
+          background: var(--bg);
+          color: var(--text-secondary);
           &.important {
-            background: #ffe5e5;
-            color: #ff3b30;
+            background: var(--danger-bg);
+            color: var(--danger);
           }
-
           &.facility {
-            background: #e5f1ff;
-            color: #007aff;
+            background: rgba(0, 122, 255, 0.08);
+            color: var(--primary-color);
           }
         }
-
         .date {
           font-size: 0.75rem;
-          color: #c7c7cc;
+          color: var(--text-secondary);
         }
       }
-
       .notice-title {
         font-size: 1rem;
         font-weight: 500;
         text-align: left;
-        color: #1c1c1e;
+        color: var(--text-primary);
         line-height: 1.4;
       }
     }
-
     .sentinel {
       height: 2rem;
       display: flex;
@@ -107,62 +97,53 @@
 }
 
 .notice-detail {
-  background: #fff;
+  background: var(--card-bg);
   min-height: 100%;
   display: flex;
   flex-direction: column;
-
   .detail-header {
     padding: 1.5rem 1.25rem;
-    border-bottom: 1px solid #f2f2f7;
-
+    border-bottom: 1px solid var(--bg);
     .detail-top {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 0.75rem;
-
       .tag {
         display: inline-block;
         font-size: 0.75rem;
         font-weight: 700;
         padding: 0.125rem 0.5rem;
         border-radius: 0.25rem;
-        background: #f2f2f7;
-        color: #8e8e93;
-
+        background: var(--bg);
+        color: var(--text-secondary);
         &.important {
-          background: #ffe5e5;
-          color: #ff3b30;
+          background: var(--danger-bg);
+          color: var(--danger);
         }
-
         &.facility {
-          background: #e5f1ff;
-          color: #007aff;
+          background: rgba(0, 122, 255, 0.08);
+          color: var(--primary-color);
         }
       }
-
       .date {
         font-size: 0.875rem;
       }
     }
-
     .title {
       font-size: 1.375rem;
       font-weight: 800;
       line-height: 1.4;
-      color: #1c1c1e;
+      color: var(--text-primary);
       margin-bottom: 0.75rem;
       letter-spacing: -0.02em;
     }
-
     .meta {
       display: flex;
       justify-content: flex-end;
       align-items: center;
       font-size: 0.8125rem;
-      color: #8e8e93;
-
+      color: var(--text-secondary);
       .info-item {
         display: flex;
         align-items: center;
@@ -170,15 +151,13 @@
       }
     }
   }
-
   .detail-body {
     padding: 1.5rem 1.25rem;
     flex: 1;
-
     p {
       font-size: 1rem;
       line-height: 1.7;
-      color: #3a3a3c;
+      color: var(--text-primary);
       margin-bottom: 1rem;
       word-break: keep-all;
     }

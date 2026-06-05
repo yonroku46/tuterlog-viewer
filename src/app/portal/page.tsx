@@ -302,7 +302,7 @@ export default function HomePage() {
         isOpen={isCenterDialogOpen}
         onClose={() => setIsCenterDialogOpen(false)}
         title="센터 선택"
-        className="home-page"
+        className="home-dialog"
       >
         <div className="center-select-list">
           {centers.length === 0 ? (
@@ -452,7 +452,7 @@ export default function HomePage() {
         isOpen={isAllReservationsOpen}
         onClose={() => setIsAllReservationsOpen(false)}
         title="전체 예약 내역"
-        className="home-page"
+        className="home-dialog"
       >
         <div className="all-reservations-view">
           <div className="current-center-info">
