@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useManage } from '../ManageContext';
+import AppImage from '@/components/contents/AppImage';
 import { Save, Upload, MapPin, Phone, FileText, Clock, Image as ImageIcon, Building } from 'lucide-react';
 import { useSnackbar } from 'notistack';
-import '@/app/portal/Portal.scss';
+import { useManage } from '../ManageContext';
 import '../ManageLayout.scss';
 
 export default function ManageSettings() {
@@ -70,7 +70,7 @@ export default function ManageSettings() {
       <div className="page-header-row">
         <div>
           <h2>센터 정보 및 설정</h2>
-          <p>수강생들에게 노출될 학원/센터 정보 및 예약 취소 정책을 설정합니다.</p>
+          <p>수강생들에게 노출될 센터/학원 정보 및 예약 취소 정책을 설정합니다.</p>
         </div>
         <button type="submit" form="settings-form" className="add-btn">
           <Save size={18} />
@@ -86,7 +86,7 @@ export default function ManageSettings() {
             <h3><Building size={18} /><span>기본 센터 정보</span></h3>
             
             <div className="form-group">
-              <label>센터(학원) 명칭 *</label>
+              <label>센터/학원 명칭 *</label>
               <input 
                 type="text" 
                 value={centerName}
@@ -162,7 +162,7 @@ export default function ManageSettings() {
                   <span className="label">센터 로고</span>
                   <div className="preview-container logo-preview">
                     {logoFile ? (
-                      <img src={logoFile} alt="Logo" />
+                      <AppImage src={logoFile} alt="Logo" width={78} height={78} />
                     ) : (
                       <div className="placeholder"><Building size={32} /></div>
                     )}
@@ -178,7 +178,7 @@ export default function ManageSettings() {
                   <span className="label">대표 커버 이미지</span>
                   <div className="preview-container cover-preview">
                     {coverFile ? (
-                      <img src={coverFile} alt="Cover" />
+                      <AppImage src={coverFile} alt="Cover" width={133} height={78} />
                     ) : (
                       <div className="placeholder"><ImageIcon size={32} /></div>
                     )}

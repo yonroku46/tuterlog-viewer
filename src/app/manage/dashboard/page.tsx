@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useManage } from '../ManageContext';
-import { Users, Calendar, Percent, Clock, Check, X, UserCheck } from 'lucide-react';
+import { Users, Calendar, Percent, Clock, Check, X, UserCheck, User } from 'lucide-react';
 import { useSnackbar } from 'notistack';
 import '@/app/portal/Portal.scss';
 import '../ManageLayout.scss';
@@ -10,6 +10,16 @@ import '../ManageLayout.scss';
 export default function ManageDashboard() {
   const { selectedCenter } = useManage();
   const { enqueueSnackbar } = useSnackbar();
+
+  const getStatusClass = (status: string) => {
+    switch (status) {
+      case '진행완료': return 'completed';
+      case '진행중': return 'ongoing';
+      case '대기중': return 'pending';
+      case '예약마감': return 'expired';
+      default: return '';
+    }
+  };
 
   // Mock pending reservation requests
   const [pendingReservations, setPendingReservations] = useState([
@@ -34,14 +44,13 @@ export default function ManageDashboard() {
     { id: '101', name: '영어 비즈니스 회화', time: '09:00 - 10:00', instructor: '이지수', room: 'A강의실', booked: 6, capacity: 8, status: '진행완료' },
     { id: '102', name: '기초 회화 패턴', time: '10:30 - 11:30', instructor: 'David Cho', room: 'B강의실', booked: 8, capacity: 8, status: '진행중' },
     { id: '103', name: 'TOEFL 실전 독해', time: '13:00 - 14:30', instructor: 'Sarah Kim', room: 'A강의실', booked: 5, capacity: 8, status: '대기중' },
-    { id: '104', name: '1:1 비즈니스 교정(PT)', time: '16:00 - 17:00', instructor: '이지수', room: 'PT룸', booked: 1, capacity: 1, status: '대기중' },
+    { id: '104', name: '1:1 비즈니스 교정(PT)', time: '16:00 - 17:00', instructor: '이지수', room: 'PT룸', booked: 1, capacity: 1, status: '예약마감' },
   ];
 
   return (
     <div className="manage-dashboard-page">
       <div className="dashboard-header-intro">
         <h2>{selectedCenter?.name || '소속 센터'} 관리 대시보드</h2>
-        <p>센터의 운영 지표와 금일 예약 일정을 요약해 보여줍니다.</p>
       </div>
 
       {/* ── KEY METRICS GRID ── */}
@@ -85,42 +94,48 @@ export default function ManageDashboard() {
         <div className="dashboard-section timeline-section">
           <div className="section-header-row">
             <h4>오늘 수업 타임라인 ({todayClasses.length}개)</h4>
-            <span className="date-tag">오늘</span>
           </div>
           
           <div className="class-timeline-list">
-            {todayClasses.map(cls => (
-              <div key={cls.id} className={`timeline-class-card ${cls.status === '진행중' ? 'active' : ''}`}>
-                <div className="time-col">
-                  <Clock size={14} />
-                  <span>{cls.time}</span>
-                </div>
-                <div className="class-body">
-                  <div className="class-meta">
-                    <span className="room">{cls.room}</span>
-                    <span className="instructor">강사: {cls.instructor}</span>
-                  </div>
-                  <h5 className="class-title">{cls.name}</h5>
-                  <div className="booking-status">
-                    <div className="progress-text">
-                      예약인원 {cls.booked}/{cls.capacity}명 
-                      {cls.booked === cls.capacity && <span className="full-badge">마감</span>}
+            {todayClasses.map(cls => {
+              const isFull = cls.booked === cls.capacity;
+              return (
+                <div key={cls.id} className="class-session-card">
+                  <div className="card-header">
+                    <div className="time-info">
+                      <Clock size={16} />
+                      <strong>{cls.time}</strong>
                     </div>
-                    <div className="progress-bar-container">
+                    <div className="badge-group">
+                      <span className="room-badge">{cls.room}</span>
+                      <span className={`status-badge ${getStatusClass(cls.status)}`}>
+                        {cls.status}
+                      </span>
+                    </div>
+                  </div>
+                  <h3 className="class-title">{cls.name}</h3>
+                  <div className="instructor-row">
+                    <User size={14} />
+                    <span>담당 강사: <strong>{cls.instructor}</strong></span>
+                  </div>
+                  <div className="attendance-preview-row">
+                    <div className="progress-info">
+                      <Users size={14} />
+                      <span>예약 정원: <strong>{cls.booked} / {cls.capacity}명</strong></span>
+                    </div>
+                    <div className="progress-bar-bg">
                       <div 
-                        className="progress-fill" 
-                        style={{ width: `${(cls.booked / cls.capacity) * 100}%`, backgroundColor: cls.booked === cls.capacity ? '#ef4444' : '#6366f1' }}
+                        className="progress-bar-fill" 
+                        style={{ 
+                          width: `${(cls.booked / cls.capacity) * 100}%`,
+                          backgroundColor: isFull ? '#ef4444' : '#6366f1'
+                        }}
                       />
                     </div>
                   </div>
                 </div>
-                <div className="status-col">
-                  <span className={`status-badge ${cls.status}`}>
-                    {cls.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

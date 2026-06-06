@@ -24,6 +24,15 @@ export default function ManageCustomers() {
   const { selectedCenter } = useManage();
   const { enqueueSnackbar } = useSnackbar();
 
+  const getStatusClass = (status: string) => {
+    switch (status) {
+      case '수강중': return 'enrolled';
+      case '만료됨': return 'expired';
+      case '대기': return 'pending';
+      default: return '';
+    }
+  };
+
   // Initial Mock Students List
   const [students, setStudents] = useState<Student[]>([
     { id: '1', name: '홍길동', phone: '010-1234-5678', email: 'gildong@example.com', joinedDate: '2026-04-12', ticketName: '영어 비즈니스 회화 24회권', remainingSessions: 12, totalSessions: 24, status: '수강중' },
@@ -155,7 +164,7 @@ export default function ManageCustomers() {
             {filteredStudents.map(student => (
               <div 
                 key={student.id} 
-                className={`customer-card ${student.status}`}
+                className={`customer-card ${getStatusClass(student.status)}`}
                 onClick={() => {
                   setSelectedStudent(student);
                   setIsDetailOpen(true);
@@ -169,7 +178,7 @@ export default function ManageCustomers() {
                     <h4>{student.name}</h4>
                     <span className="joined-date">가입일: {student.joinedDate}</span>
                   </div>
-                  <span className={`status-badge ${student.status}`}>
+                  <span className={`status-badge ${getStatusClass(student.status)}`}>
                     {student.status}
                   </span>
                 </div>
@@ -314,7 +323,7 @@ export default function ManageCustomers() {
                 <span>{selectedStudent.name.charAt(0)}</span>
               </div>
               <h3>{selectedStudent.name}</h3>
-              <span className={`status-badge ${selectedStudent.status}`}>{selectedStudent.status}</span>
+              <span className={`status-badge ${getStatusClass(selectedStudent.status)}`}>{selectedStudent.status}</span>
             </div>
 
             <div className="details-info-section">

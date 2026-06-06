@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import AppImage from '@/components/contents/AppImage';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { ManageProvider, useManage } from './ManageContext';
@@ -65,7 +66,7 @@ function ManageLayoutInner({ children }: { children: React.ReactNode }) {
             <div className="user-profile">
               <div className="avatar">
                 {user.profileImg ? (
-                  <img src={user.profileImg} alt={user.name} />
+                  <AppImage src={user.profileImg} alt={user.name} width={32} height={32} />
                 ) : (
                   <span className="avatar-initial">{user.name.charAt(0)}</span>
                 )}
@@ -145,7 +146,7 @@ function ManageLayoutInner({ children }: { children: React.ReactNode }) {
               <div className="user-info">
                 <div className="avatar">
                   {user.profileImg ? (
-                    <img src={user.profileImg} alt={user.name} />
+                    <AppImage src={user.profileImg} alt={user.name} width={36} height={36} />
                   ) : (
                     <span>{user.name.charAt(0)}</span>
                   )}
