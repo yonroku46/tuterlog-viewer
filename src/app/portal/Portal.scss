@@ -7,19 +7,18 @@
 .home-page,
 .home-dialog {
   .home-header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
     .center-selector {
       display: inline-flex;
       align-items: center;
       gap: 0.375rem;
       cursor: pointer;
-      padding: 0.5rem 0;
       transition: opacity 0.2s;
       &:active {
         opacity: 0.6;
       }
       h1 {
-        font-size: 1.375rem;
+        font-size: 1.25rem;
         font-weight: 800;
         color: var(--text-primary);
         letter-spacing: -0.02em;

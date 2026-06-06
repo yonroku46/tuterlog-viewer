@@ -75,8 +75,7 @@ export default function LandingPage() {
       {/* ── HERO ── */}
       <section className="landing-hero">
         <div className="landing-hero-badge">
-          <span className="landing-hero-badge-dot" />
-          언어 교육 전문 스마트 매니저
+          수업관리 스마트 매니저
         </div>
         <h1 className="landing-hero-title">
           수업은 집중하고,<br />

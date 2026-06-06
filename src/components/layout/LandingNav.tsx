@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import AppImage from '@/components/contents/AppImage';
 import { useAuth } from '@/providers/AuthProvider';
 import { Menu, X, ChevronDown, LayoutDashboard, Globe, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -84,7 +85,7 @@ export default function LandingNav() {
                   >
                     <div className="profile-avatar">
                       {user.profileImg ? (
-                        <Image 
+                        <AppImage 
                           src={user.profileImg} 
                           alt={user.name} 
                           width={32} 
@@ -193,7 +194,7 @@ export default function LandingNav() {
                 <div className="mobile-user-info">
                   <div className="profile-avatar">
                     {user.profileImg ? (
-                      <Image 
+                      <AppImage 
                         src={user.profileImg} 
                         alt={user.name} 
                         width={40} 

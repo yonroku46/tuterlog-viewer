@@ -91,7 +91,7 @@ export default function ContactPage() {
             </h1>
             <p className="contact-left-sub">
               서비스 이용 중 궁금한 점이나 제안하고 싶은 기능이 있으신가요? 
-              오른쪽 양식을 작성해 주시면 담당자가 확인 후 답변드립니다.
+              담당자가 확인 후 24시간 이내에 답변드립니다.
             </p>
 
             <div className="contact-info-list">
@@ -104,11 +104,6 @@ export default function ContactPage() {
                   <p className="contact-info-value">평일 10:00 - 18:00 (KST)</p>
                 </div>
               </div>
-            </div>
-
-            <div className="contact-response-box">
-              <div className="contact-response-dot" />
-              <p className="contact-response-text">평균 응답 시간: 24시간 이내</p>
             </div>
           </div>
         </div>
