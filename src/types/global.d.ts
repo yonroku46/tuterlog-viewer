@@ -25,6 +25,7 @@ declare global {
     count: number
   }
   // Business
+  type LimitUnitType = 'HOUR' | 'MINUTE';
   type TicketType = 'GROUP' | 'PT';
   type ContentType = 'TICKET' | 'PRODUCT' | 'RESERVATION' | 'CENTER';
   type NotificationIconType = 'LOGO' | 'AVATAR';
@@ -85,6 +86,15 @@ declare global {
     address: string;
     phone?: string;
     createTime: string;
+    businessNum?: string;
+    cancelNoLimit?: boolean;
+    cancelValue?: number;
+    cancelUnit?: LimitUnitType;
+    bookingNoLimit?: boolean;
+    bookingLimitValue?: number;
+    bookingLimitUnit?: LimitUnitType;
+    operatingHours?: string;
+    logoImg?: string;
   }
   interface CenterPost {
     postId: string;

@@ -1,5 +1,9 @@
 const ROOT = process.env.NEXT_PUBLIC_API_ROOT || '';
 
+// manage
+const MANAGE_ROOT = `${ROOT}/manage`;
+const MANAGE_CENTER = `${MANAGE_ROOT}/center`;
+
 // lounge
 const LOUNGE_ROOT = `${ROOT}/lounge`;
 const LOUNGE_POST_LIST = `${LOUNGE_ROOT}/posts`;
@@ -66,6 +70,7 @@ const ApiRoutes = {
   AUTH_VERIFY_CONFIRM,
   AUTH_FORGOT_PASSWORD,
   AUTH_RESET_PASSWORD,
+  MANAGE_CENTER,
   LOUNGE_POST_LIST,
   LOUNGE_POST,
   LOUNGE_POST_LIKE,

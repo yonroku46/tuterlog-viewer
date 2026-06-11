@@ -65,7 +65,7 @@ const NAV_ITEMS = ['대시보드', '고객 관리', '일정 확인', '설정'];
 export default function LandingPage() {
   const { user } = useAuth();
 
-  const ctaHref = user ? (user.centerOwnerFlg ? '/portal' : '/manage/dashboard') : '/login';
+  const ctaHref = user ? (user.centerOwnerFlg ? '/manage/dashboard' : '/portal') : '/login';
   const ctaLabel = user ? (user.centerOwnerFlg ? '센터관리 바로가기' : '서비스 바로가기') : '무료로 시작하기';
 
   return (

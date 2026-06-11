@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useManage } from '../ManageContext';
 import SlideDialog from '@/components/dialog/SlideDialog';
 import { useSnackbar } from 'notistack';
-import { Plus, Search, Tag, Calendar, Coins, Edit2, Trash2, Power, PowerOff } from 'lucide-react';
+import { Plus, Search, Tag, Timer, Calendar, Coins, Edit2, Trash2, Power, PowerOff } from 'lucide-react';
 import '../ManageLayout.scss';
 
 interface Ticket {
@@ -265,7 +265,7 @@ export default function TicketManagementPage() {
                 </div>
                 <div className="detail-item price-row">
                   <Coins size={14} />
-                  <strong>₩{ticket.price.toLocaleString()}</strong>
+                  <strong>{ticket.price.toLocaleString()}원</strong>
                 </div>
               </div>
             </div>
@@ -411,7 +411,7 @@ export default function TicketManagementPage() {
 
               {selectedTicket.type === '횟수제' && (
                 <div className="info-detail-item">
-                  <Coins size={18} />
+                  <Timer size={18} />
                   <div>
                     <span className="label">제공 횟수</span>
                     <span className="value">{selectedTicket.count}회 예약 가능</span>
@@ -431,7 +431,7 @@ export default function TicketManagementPage() {
                 <Coins size={18} />
                 <div>
                   <span className="label">요금 단가</span>
-                  <span className="value">₩{selectedTicket.price.toLocaleString()} 원</span>
+                  <span className="value">{selectedTicket.price.toLocaleString()}원</span>
                 </div>
               </div>
             </div>

@@ -19,6 +19,44 @@ interface Instructor {
   status: '활동중' | '계약대기' | '활동정지';
 }
 
+const getProfileImgByName = (name: string) => {
+  if (!name) return '/assets/img/avatar1.webp';
+  const mapping: { [key: string]: string } = {
+    '홍길동': '/assets/img/avatar1.webp',
+    '이영희': '/assets/img/avatar2.webp',
+    '김철수': '/assets/img/avatar3.webp',
+    '아오이': '/assets/img/avatar4.webp',
+    '최현우': '/assets/img/avatar1.webp',
+    '이지수': '/assets/img/avatar2.webp',
+    'Sarah Kim': '/assets/img/avatar3.webp',
+    'David Cho': '/assets/img/avatar4.webp',
+    '김민아': '/assets/img/avatar1.webp',
+    '박진우': '/assets/img/avatar2.webp',
+    '김지은': '/assets/img/avatar3.webp',
+    '박준혁': '/assets/img/avatar4.webp',
+    '이유진': '/assets/img/avatar1.webp',
+    '최지민': '/assets/img/avatar2.webp',
+    '강동우': '/assets/img/avatar3.webp',
+    '임지선': '/assets/img/avatar4.webp',
+    '유성민': '/assets/img/avatar1.webp',
+    '윤서준': '/assets/img/avatar2.webp',
+    '한예슬': '/assets/img/avatar3.webp',
+    '신태호': '/assets/img/avatar4.webp',
+    '정다빈': '/assets/img/avatar1.webp',
+    '박영호': '/assets/img/avatar2.webp',
+    '임은정': '/assets/img/avatar3.webp'
+  };
+  if (mapping[name]) {
+    return mapping[name];
+  }
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash % 4) + 1;
+  return `/assets/img/avatar${index}.webp`;
+};
+
 export default function ManageInstructors() {
   const { selectedCenter } = useManage();
   const { enqueueSnackbar } = useSnackbar();
@@ -39,6 +77,15 @@ export default function ManageInstructors() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState<Instructor | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Edit form states
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editSpecialty, setEditSpecialty] = useState('');
+  const [editBio, setEditBio] = useState('');
+  const [editStatus, setEditStatus] = useState<'활동중' | '계약대기' | '활동정지'>('활동중');
 
   // Form states for new instructor
   const [newInstructor, setNewInstructor] = useState({
@@ -49,6 +96,42 @@ export default function ManageInstructors() {
     bio: '',
     status: '활동중' as '활동중' | '계약대기' | '활동정지'
   });
+
+  const handleStartEdit = () => {
+    if (selectedInstructor) {
+      setEditName(selectedInstructor.name);
+      setEditPhone(selectedInstructor.phone);
+      setEditEmail(selectedInstructor.email);
+      setEditSpecialty(selectedInstructor.specialty);
+      setEditBio(selectedInstructor.bio);
+      setEditStatus(selectedInstructor.status);
+      setIsEditing(true);
+    }
+  };
+
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editName || !editPhone) {
+      enqueueSnackbar('이름과 연락처는 필수 입력값입니다.', { variant: 'error' });
+      return;
+    }
+    if (selectedInstructor) {
+      const updated: Instructor = {
+        ...selectedInstructor,
+        name: editName,
+        phone: editPhone,
+        email: editEmail || '미지정',
+        specialty: editSpecialty,
+        bio: editBio || '등록된 소개글이 없습니다.',
+        status: editStatus
+      };
+
+      setInstructors(prev => prev.map(s => s.id === selectedInstructor.id ? updated : s));
+      setSelectedInstructor(updated);
+      setIsEditing(false);
+      enqueueSnackbar(`${editName} 강사 정보가 수정되었습니다.`, { variant: 'success' });
+    }
+  };
 
   const handleAddInstructor = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,12 +240,17 @@ export default function ManageInstructors() {
                 className={`customer-card ${instructor.status === '활동중' ? '수강중' : instructor.status === '계약대기' ? '대기' : '만료됨'}`}
                 onClick={() => {
                   setSelectedInstructor(instructor);
+                  setIsEditing(false);
                   setIsDetailOpen(true);
                 }}
               >
                 <div className="card-top">
-                  <div className="user-icon-avatar" style={{ background: 'var(--manage-primary-light)', color: 'var(--manage-primary)' }}>
-                    <GraduationCap size={18} />
+                  <div className="user-icon-avatar" style={{ overflow: 'hidden' }}>
+                    <img 
+                      src={getProfileImgByName(instructor.name)} 
+                      alt={instructor.name} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} 
+                    />
                   </div>
                   <div className="user-meta-info">
                     <h4>{instructor.name}</h4>
@@ -298,71 +386,164 @@ export default function ManageInstructors() {
       >
         {selectedInstructor && (
           <div className="student-details-view">
-            <div className="details-header">
-              <div className="avatar-circle" style={{ background: 'linear-gradient(135deg, var(--manage-primary-light), var(--manage-primary))' }}>
-                <span>{selectedInstructor.name.charAt(0)}</span>
-              </div>
-              <h3>{selectedInstructor.name}</h3>
-              <span className={`status-badge ${selectedInstructor.status === '활동중' ? '수강중' : selectedInstructor.status === '계약대기' ? '대기' : '만료됨'}`}>
-                {selectedInstructor.status}
-              </span>
-            </div>
-
-            <div className="details-info-section">
-              <h4>기본 연락 정보</h4>
-              <div className="info-detail-item">
-                <Phone size={16} />
-                <div>
-                  <span className="label">전화번호</span>
-                  <span className="value">{selectedInstructor.phone}</span>
+            {isEditing ? (
+              <form className="add-student-form" onSubmit={handleSaveEdit}>
+                <div className="form-group">
+                  <label>이름 *</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                  />
                 </div>
-              </div>
-              <div className="info-detail-item">
-                <Mail size={16} />
-                <div>
-                  <span className="label">이메일</span>
-                  <span className="value">{selectedInstructor.email}</span>
-                </div>
-              </div>
-              <div className="info-detail-item">
-                <Calendar size={16} />
-                <div>
-                  <span className="label">계약 등록일</span>
-                  <span className="value">{selectedInstructor.joinedDate}</span>
-                </div>
-              </div>
-            </div>
 
-            <div className="details-info-section">
-              <h4>강사 소개 및 전문 분야</h4>
-              <div className="ticket-card-view" style={{ background: 'linear-gradient(135deg, var(--slate-700) 0%, var(--slate-900) 100%)' }}>
-                <span className="ticket-title">{selectedInstructor.specialty}</span>
-                <p className="no-ticket-msg" style={{ color: 'var(--slate-200)', fontStyle: 'normal', fontSize: '0.875rem', marginTop: '0.5rem', lineHeight: '1.5' }}>
-                  {selectedInstructor.bio}
-                </p>
-              </div>
-            </div>
+                <div className="form-group">
+                  <label>연락처 *</label>
+                  <input 
+                    type="tel" 
+                    required
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                  />
+                </div>
 
-            <div className="detail-actions-row">
-              <button 
-                type="button" 
-                className="btn-danger"
-                onClick={() => handleDelete(selectedInstructor.id, selectedInstructor.name)}
-              >
-                <Trash2 size={16} />
-                <span>계약 해지 (삭제)</span>
-              </button>
-              <button 
-                type="button" 
-                className="btn-primary"
-                onClick={() => {
-                  enqueueSnackbar('강사 정보 수정 기능은 준비 중입니다.', { variant: 'info' });
-                }}
-              >
-                <Edit size={16} />
-                <span>프로필 수정</span>
-              </button>
-            </div>
+                <div className="form-group">
+                  <label>이메일 주소</label>
+                  <input 
+                    type="email" 
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>전문 강의 분야</label>
+                  <input 
+                    type="text" 
+                    value={editSpecialty}
+                    onChange={(e) => setEditSpecialty(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>한줄 소개</label>
+                  <textarea 
+                    rows={3}
+                    value={editBio}
+                    onChange={(e) => setEditBio(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>활동 상태</label>
+                  <div className="radio-group">
+                    <label className="radio-label">
+                      <input 
+                        type="radio" 
+                        name="edit-status" 
+                        checked={editStatus === '활동중'}
+                        onChange={() => setEditStatus('활동중')}
+                      />
+                      <span>활동중</span>
+                    </label>
+                    <label className="radio-label">
+                      <input 
+                        type="radio" 
+                        name="edit-status" 
+                        checked={editStatus === '계약대기'}
+                        onChange={() => setEditStatus('계약대기')}
+                      />
+                      <span>계약대기</span>
+                    </label>
+                    <label className="radio-label">
+                      <input 
+                        type="radio" 
+                        name="edit-status" 
+                        checked={editStatus === '활동정지'}
+                        onChange={() => setEditStatus('활동정지')}
+                      />
+                      <span>활동정지</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="dialog-actions-row" style={{ marginTop: '1.5rem' }}>
+                  <button type="button" className="btn-cancel" onClick={() => setIsEditing(false)}>취소</button>
+                  <button type="submit" className="btn-submit">수정 완료</button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <div className="details-header">
+                  <div className="avatar-circle" style={{ overflow: 'hidden' }}>
+                    <img 
+                      src={getProfileImgByName(selectedInstructor.name)} 
+                      alt={selectedInstructor.name} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} 
+                    />
+                  </div>
+                  <h3>{selectedInstructor.name}</h3>
+                  <span className={`status-badge ${selectedInstructor.status === '활동중' ? '수강중' : selectedInstructor.status === '계약대기' ? '대기' : '만료됨'}`}>
+                    {selectedInstructor.status}
+                  </span>
+                </div>
+
+                <div className="details-info-section">
+                  <h4>기본 연락 정보</h4>
+                  <div className="info-detail-item">
+                    <Phone size={16} />
+                    <div>
+                      <span className="label">전화번호</span>
+                      <span className="value">{selectedInstructor.phone}</span>
+                    </div>
+                  </div>
+                  <div className="info-detail-item">
+                    <Mail size={16} />
+                    <div>
+                      <span className="label">이메일</span>
+                      <span className="value">{selectedInstructor.email}</span>
+                    </div>
+                  </div>
+                  <div className="info-detail-item">
+                    <Calendar size={16} />
+                    <div>
+                      <span className="label">계약 등록일</span>
+                      <span className="value">{selectedInstructor.joinedDate}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="details-info-section">
+                  <h4>강사 소개 및 전문 분야</h4>
+                  <div className="ticket-card-view" style={{ background: 'linear-gradient(135deg, var(--slate-700) 0%, var(--slate-900) 100%)' }}>
+                    <span className="ticket-title">{selectedInstructor.specialty}</span>
+                    <p className="no-ticket-msg" style={{ color: 'var(--slate-200)', fontStyle: 'normal', fontSize: '0.875rem', marginTop: '0.5rem', lineHeight: '1.5' }}>
+                      {selectedInstructor.bio}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="detail-actions-row">
+                  <button 
+                    type="button" 
+                    className="btn-danger"
+                    onClick={() => handleDelete(selectedInstructor.id, selectedInstructor.name)}
+                  >
+                    <Trash2 size={16} />
+                    <span>계약 해지 (삭제)</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn-primary"
+                    onClick={handleStartEdit}
+                  >
+                    <Edit size={16} />
+                    <span>프로필 수정</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </SlideDialog>
